@@ -1,0 +1,38 @@
+<!-- Petite fenêtre de saisie (renommer / renuméroter / confirmer suppression) -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WordPiece</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 12px;
+    font-family: "Segoe UI", system-ui, sans-serif; font-size: 13px; color: #1f2430;
+  }
+  h1 { font-size: 14px; margin: 0 0 8px; color: #1e40af; }
+  #msg { margin-bottom: 8px; line-height: 1.35; white-space: pre-line; }
+  #input {
+    width: 100%; padding: 8px 10px; font-size: 14px;
+    border: 1px solid #cbd3e1; border-radius: 6px;
+  }
+  #input:focus { outline: 2px solid #2563eb; border-color: #2563eb; }
+  .btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+  button {
+    padding: 8px 14px; border-radius: 6px; font-size: 13px; cursor: pointer;
+    border: 1px solid #cbd3e1; background: #fff; font-family: inherit;
+  }
+  button:hover { background: #f0f2f7; }
+  #ok { background: #2563eb; border-color: #2563eb; color: #fff; font-weight: 600; }
+  #ok:hover { background: #1e40af; }
+  #ok.danger { background: #dc2626; border-color: #dc2626; }
+</style>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+
+<h1 id="title">WordPiece</h1>
+<div id="msg"></div>
+<input id="input" type="text" />
+<div class="btns">
+  <button id="cancel" type="button">Annuler</button>
+  <button id="ok" type="button">OK</button>
+</div>
+
+<script src="dialog.js"></script>

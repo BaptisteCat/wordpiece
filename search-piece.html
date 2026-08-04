@@ -1,0 +1,45 @@
+<!-- Palette de recherche : citer une pièce par son NOM (fenêtre centrée, hors du volet) -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Citer une pièce</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Segoe UI", system-ui, sans-serif; font-size: 13px; color: #1f2430;
+    display: flex; flex-direction: column; height: 100vh; background: #fff;
+  }
+  .search { padding: 12px 12px 8px; border-bottom: 1px solid #e6e9f0; }
+  #q {
+    width: 100%; padding: 9px 11px; font-size: 15px; font-family: inherit;
+    border: 1px solid #cbd3e1; border-radius: 8px; outline: none;
+  }
+  #q:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+  .hint { font-size: 11px; color: #8a90a0; margin-top: 6px; }
+  ul {
+    list-style: none; margin: 0; padding: 6px; flex: 1;
+    column-gap: 8px; column-fill: auto;   /* remplir une colonne de haut en bas AVANT de passer à la suivante */
+    overflow-x: auto; overflow-y: hidden;  /* le nombre de colonnes (fixé en JS) garantit que tout tient */
+  }
+  li {
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 7px; cursor: pointer;
+    break-inside: avoid; -webkit-column-break-inside: avoid; /* ne pas couper une ligne entre 2 colonnes */
+  }
+  li.sel { background: #eef2fb; }
+  li:hover { background: #f2f4f9; }
+  .num {
+    min-width: 28px; height: 22px; padding: 0 5px; display: grid; place-items: center;
+    background: #2563eb; color: #fff; border-radius: 6px; font-weight: 700; font-size: 12px; flex: none;
+  }
+  .num.grey { background: #6b7280; }
+  .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .empty { padding: 22px 12px; text-align: center; color: #8a90a0; }
+</style>
+
+<div class="search">
+  <input id="q" type="text" placeholder="Nom ou numéro…" autocomplete="off" />
+  <div class="hint">↑ ↓ pour naviguer · Entrée pour citer · Échap pour annuler</div>
+</div>
+<ul id="list"></ul>
+
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<script src="search-piece.js"></script>

@@ -1,0 +1,453 @@
+:root {
+  --blue: #2563eb;
+  --blue-dark: #1e40af;
+  --red: #dc2626;
+  --amber: #b45309;
+  --green: #15803d;
+  --bg: #ffffff;
+  --panel: #f4f6fb;
+  --border: #e2e6ee;
+  --text: #1f2430;
+  --muted: #6b7280;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.hidden { display: none !important; }
+.muted { color: var(--muted); font-weight: 400; }
+.pad { padding: 16px; }
+
+main { padding: 12px; }
+
+section { margin-bottom: 14px; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.row { display: flex; gap: 6px; }
+.row input { flex: 1; }
+
+/* Ajout d'une pièce : bouton + discret, replié par défaut */
+.add-section { margin-bottom: 14px; }
+/* « + Nouvelle pièce » et bordereau : deux moitiés équilibrées sur une ligne. Police réduite
+   pour que les libellés complets tiennent, même sur un volet à largeur par défaut (~320 px). */
+.action-row { display: flex; gap: 8px; align-items: stretch; }
+.add-toggle {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  flex: 1; height: 38px; padding: 0 8px;
+  font-size: 11.5px; font-weight: 600; line-height: 1.1;
+}
+.add-toggle .plus { font-size: 17px; font-weight: 700; }
+.add-section .row .btn { flex: none; min-width: 38px; }
+
+input, select {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--text);
+}
+input:focus, select:focus { outline: 2px solid var(--blue); border-color: var(--blue); }
+
+.btn {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn:hover { background: #f0f2f7; }
+.btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; min-width: 38px; }
+.btn.primary:hover { background: var(--blue-dark); }
+
+/* Bouton contour (fond blanc, bordure + texte bleus) */
+.btn.outline { background: #fff; border-color: var(--blue); color: var(--blue); font-weight: 600; }
+.btn.outline:hover { background: #eff4ff; border-color: var(--blue-dark); color: var(--blue-dark); }
+
+/* Bouton bordereau : occupe le reste de la ligne, à droite du « + » */
+.bordereau-action { flex: 1; min-width: 0; }
+/* Hauteur fixe → on centre en flex et on annule le padding vertical de .btn
+   (sinon le padding du haut pousse le libellé vers le bas). */
+.bordereau-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 100%; height: 38px; padding: 0 10px;
+  font-size: 11.5px; line-height: 1.1;
+}
+.bordereau-row { display: flex; gap: 6px; align-items: stretch; }
+.bordereau-row .bordereau-btn { flex: 1; width: auto; }
+.bordereau-row .mini.trash { height: 38px; margin-left: 0; }
+.scan-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 100%; height: 38px; padding: 0 10px; margin-top: 6px;
+  line-height: 1.1;
+}
+
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+h3 { font-size: 13px; margin: 0; }
+
+/* Recherche dans la liste des pièces */
+.piece-search { margin-bottom: 8px; }
+
+/* Liste des pièces */
+.list { display: flex; flex-direction: column; gap: 6px; }
+.piece {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  background: #fff;
+}
+/* Flash au réordonnancement (▲▼) : la ligne déplacée s'illumine DOUCEMENT en bleu puis s'estompe */
+@keyframes wp-flash {
+  0%   { background: #dbeafe; border-color: #93c5fd; }
+  100% { background: #fff; border-color: var(--border); }
+}
+.piece.flash { animation: wp-flash 1.8s ease-out; }
+.piece-top { display: flex; align-items: center; gap: 8px; }
+.badge {
+  min-width: 26px; height: 24px;
+  padding: 0 6px;
+  display: grid; place-items: center;
+  background: var(--blue); color: #fff;
+  border-radius: 6px; font-weight: 700; font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.badge:hover { background: var(--blue-dark); }
+
+/* Numéro éditable directement dans le volet (mode manuel) */
+.badge-input {
+  width: 46px; flex: none;
+  height: 24px; padding: 0 4px;
+  background: var(--blue); color: #fff;
+  border: 1px solid var(--blue); border-radius: 6px;
+  text-align: center; font-weight: 700; font-size: 12px;
+  font-family: inherit;
+}
+.badge-input:focus { outline: 2px solid var(--blue-dark); background: var(--blue-dark); }
+.badge-input::selection { background: rgba(255,255,255,0.35); }
+.piece-name {
+  flex: 1;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 4px 6px;
+  border-radius: 5px;
+  font-size: 13px;
+}
+.piece-name:hover { border-color: var(--border); }
+.piece-name:focus { border-color: var(--blue); background: #fff; }
+
+.count {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: #eef2ff;
+  color: var(--blue-dark);
+  white-space: nowrap;
+}
+.count.zero { background: #fff4e5; color: var(--amber); }
+
+/* Pièce SCANNÉE (déjà présente dans le document) : liseré teal + petite loupe */
+.piece.scanned { border-left: 3px solid #0d9488; padding-left: 8px; }
+.scan-mark { flex: none; font-size: 11px; cursor: help; opacity: 0.75; }
+
+/* Verrou de numéro (🔒 / 🔓) dans la barre d'actions, juste à gauche de la poubelle */
+.mini.lock { min-width: 30px; text-align: center; }
+.mini.lock.on { border-color: #6b7280; background: #f3f4f6; }
+/* Pousse un bouton (et ceux qui le suivent) à droite de la barre */
+.mini.push-right { margin-left: auto; }
+
+/* Badge d'une pièce VERROUILLÉE : GRIS au lieu de bleu */
+.badge-input.locked { background: #6b7280; border-color: #6b7280; }
+.badge-input.locked:focus { outline: 2px solid #4b5563; background: #4b5563; }
+
+/* Barre d'outils de la liste : « Ordre d'apparition » + « Tout verrouiller » */
+.list-toolbar { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.list-toolbar .mini { border-color: var(--blue); color: var(--blue-dark); font-weight: 600; }
+
+/* Lien discret « Format personnalisé… » sous le bouton de scan */
+.link-btn { background: none; border: none; color: var(--blue); font-size: 11px; cursor: pointer; padding: 4px 2px 0; text-decoration: underline; align-self: flex-start; }
+.link-btn:hover { color: var(--blue-dark); }
+
+/* Ligne « pièces identiques » dans le diagnostic, avec bouton Fusionner */
+.dup-row { display: flex; align-items: center; gap: 8px; justify-content: space-between; margin-top: 6px; }
+.dup-row .mini { flex: none; border-color: var(--blue); color: var(--blue-dark); font-weight: 600; }
+
+.piece-actions { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.mini {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.mini:hover { background: #f0f2f7; }
+.mini.insert { border-color: var(--blue); color: var(--blue-dark); font-weight: 600; }
+.mini.danger:hover { background: #fee2e2; border-color: var(--red); color: var(--red); }
+.mini:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* Bouton supprimer : rouge avec poubelle */
+.mini.trash {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--red); border-color: var(--red); color: #fff;
+  padding: 5px 10px;
+}
+.mini.trash:hover { background: #b91c1c; border-color: #b91c1c; }
+.ic-trash { width: 16px; height: 16px; display: block; }
+
+/* Navigation par occurrence (▲ ▼) */
+.mini.nav { min-width: 26px; text-align: center; font-weight: 700; }
+
+/* Confirmation de suppression EN LIGNE (plus de popup) */
+.piece-actions.confirm { align-items: center; }
+.confirm-q { font-size: 12px; color: var(--red); font-weight: 600; margin-right: auto; }
+.mini.trash-solid {
+  background: var(--red); border-color: var(--red); color: #fff; font-weight: 600;
+}
+.mini.trash-solid:hover { background: #b91c1c; border-color: #b91c1c; }
+
+/* Boutons carrés de confirmation (annuler = rouge / valider = vert) */
+.mini.sq {
+  width: 34px; height: 34px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.mini.sq .ic-sq { width: 18px; height: 18px; display: block; }
+.mini.sq.red   { background: var(--red);   border-color: var(--red);   color: #fff; }
+.mini.sq.red:hover   { background: #b91c1c; border-color: #b91c1c; }
+.mini.sq.green { background: var(--green); border-color: var(--green); color: #fff; }
+.mini.sq.green:hover { background: #166534; border-color: #166534; }
+
+.empty { padding: 14px; text-align: center; border: 1px dashed var(--border); border-radius: 8px; }
+
+/* Diagnostics : bloc ROUGE (erreurs) + bloc AMBRE (à vérifier) */
+.diag { font-size: 12px; }
+.diag-block { border-radius: 8px; padding: 10px; border: 1px solid; }
+.diag-block + .diag-block { margin-top: 8px; }
+.diag-block.err  { background: #fef2f2; border-color: #fca5a5; color: #b91c1c; }
+.diag-block.warn { background: #fff7ed; border-color: #fdba74; color: var(--amber); }
+.diag-block ul { margin: 6px 0 0; padding-left: 18px; }
+
+/* Actions */
+.actions { display: flex; flex-direction: column; gap: 6px; }
+.actions .btn { text-align: left; }
+
+/* Réglages */
+summary { cursor: pointer; font-weight: 600; padding: 2px 0; }
+.setting { margin-top: 10px; }
+.setting label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 12px; }
+.hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.hint code { background: #eef2ff; padding: 1px 4px; border-radius: 3px; }
+
+/* Bouton icône rond (aide « ? », information « i ») */
+.icon-btn {
+  width: 24px; height: 24px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--blue); background: #fff; color: var(--blue);
+  border-radius: 50%; cursor: pointer;
+  font-size: 13px; font-weight: 700; font-style: normal; line-height: 1;
+  font-family: Georgia, "Times New Roman", serif;
+  flex: none;
+}
+.icon-btn:hover { background: var(--blue); color: #fff; }
+.icon-btn.sm { width: 22px; height: 22px; font-size: 12px; }
+
+/* Barre supérieure : croix de fermeture à gauche, bouton d'aide à droite */
+/* Pop-up intégrée au volet : overlay flouté + carte */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+  background: rgba(30, 41, 59, 0.28);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  animation: modal-fade 0.12s ease-out;
+}
+@keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+.modal-card {
+  background: #fff; border-radius: 12px; width: 100%; max-width: 300px;
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.28);
+  padding: 16px; animation: modal-pop 0.14s ease-out;
+}
+@keyframes modal-pop { from { transform: scale(0.96); opacity: 0.6; } to { transform: scale(1); opacity: 1; } }
+.modal-title { font-size: 14px; font-weight: 700; color: var(--blue-dark); margin-bottom: 8px; }
+.modal-msg { font-size: 12.5px; line-height: 1.4; color: #1f2430; margin-bottom: 14px; }
+.modal-msg b { color: var(--blue-dark); }
+.modal-btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.modal-btns .btn { padding: 7px 12px; font-size: 12.5px; }
+
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg);
+  margin: 0 0 8px; padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.top-left { display: flex; align-items: center; gap: 6px; }
+.top-actions { display: flex; align-items: center; gap: 6px; }
+/* Pastilles d'alerte (visibles quand le bloc « À corriger / À vérifier » est hors écran) */
+.pip {
+  width: 22px; height: 22px; border-radius: 50%; border: none; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.pip:hover { filter: brightness(1.08); }
+.pip.err  { background: var(--red);  color: var(--red); }   /* color = « ! » évidé dans le triangle blanc */
+.pip.warn { background: #d97706;     color: #d97706; }
+.icon-btn:disabled { opacity: 0.3; cursor: default; }
+.icon-btn:disabled:hover { background: #fff; color: var(--blue); }
+
+/* Croix de fermeture du volet (bouton maison, calé à la même hauteur que le « ? ») */
+.icon-btn.close-x {
+  border-color: #e5b3b3; color: var(--red);
+  font-family: "Segoe UI", system-ui, sans-serif; font-weight: 700; font-size: 14px;
+}
+.icon-btn.close-x:hover { background: var(--red); border-color: var(--red); color: #fff; }
+
+/* Notice (mode d'emploi) */
+.help-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px 12px;
+  margin-bottom: 14px;
+  font-size: 12px; line-height: 1.5;
+}
+.help-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.help-head strong { font-size: 13px; color: var(--blue-dark); }
+.help-panel p { margin: 6px 0; }
+.help-sub { margin: 12px 0 2px !important; font-weight: 700; color: var(--blue-dark); }
+.help-list { margin: 4px 0 0; padding-left: 16px; }
+.help-list li { margin: 3px 0; }
+.help-panel code {
+  background: #eef2ff; color: var(--blue-dark);
+  padding: 1px 4px; border-radius: 3px; font-size: 11px;
+}
+.help-panel kbd {
+  background: #fff; border: 1px solid var(--border); border-bottom-width: 2px;
+  border-radius: 4px; padding: 0 4px; font-size: 11px; font-family: inherit;
+}
+
+/* Icône engrenage (SVG) dans la barre supérieure */
+.icon-btn svg { display: block; }
+
+/* Ligne du bouton « Désactiver » + son bouton info */
+.disable-row { display: flex; align-items: center; gap: 8px; }
+.disable-row .disable-btn { flex: 1; width: auto; }
+.disable-info { margin-top: 8px; }
+
+/* Bandeau d'erreur persistant (diagnostic) */
+.err-banner {
+  background: #fef2f2; border: 1px solid var(--red); color: var(--red);
+  border-radius: 8px; padding: 10px; margin-bottom: 12px;
+  font-size: 12px; line-height: 1.4; word-break: break-word; white-space: pre-wrap;
+}
+
+/* Sous-sections des réglages */
+.fs {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px 10px;
+  margin: 12px 0 0;
+}
+.fs legend { font-size: 11px; font-weight: 700; color: var(--blue-dark); padding: 0 4px; }
+
+.fmt-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.fmt-row .align { flex: 1; min-width: 120px; width: auto; }
+
+.chk {
+  display: inline-flex; align-items: center; gap: 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  cursor: pointer;
+  user-select: none;
+  background: #fff;
+  font-size: 13px;
+}
+.chk:hover { background: #f0f2f7; }
+.chk input { width: auto; margin: 0; }
+.chk.sz { gap: 4px; }
+.chk.sz input { width: 52px; padding: 4px 6px; }
+
+.fmt-grid {
+  display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+}
+.fmt-label {
+  min-width: 66px; font-weight: 600; font-size: 12px; color: var(--muted);
+}
+
+.save-note { margin-top: 12px; color: var(--green); }
+
+/* Barre contextuelle (curseur sur une citation) */
+.ctxbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #eef4ff;
+  border: 1px solid #bfd3ff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+}
+.ctx-info { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ctx-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--blue); flex: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+#ctxLabel {
+  font-size: 12px; font-weight: 600; color: var(--blue-dark);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ctxbar .mini.danger { flex: none; }
+
+.toast {
+  position: fixed; left: 12px; right: 12px; bottom: 12px;
+  background: var(--text); color: #fff;
+  padding: 9px 12px; border-radius: 8px;
+  font-size: 12px; text-align: center;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none; z-index: 50;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.busy { opacity: 0.6; pointer-events: none; }
+
+/* Désactivation de l'extension pour ce document */
+.disable-section { margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--border); }
+.disable-btn { width: 100%; height: 36px; border-color: #e5b3b3; color: var(--red); font-weight: 600; }
+.disable-btn:hover { background: #fef2f2; border-color: var(--red); }
+
+.disabled-banner {
+  background: #fff7ed; border: 1px solid #fdba74; color: var(--amber);
+  border-radius: 8px; padding: 10px; font-size: 12px; line-height: 1.4; margin-bottom: 12px;
+}
+
+/* Volet inerte quand l'extension est désactivée : tout est grisé/bloqué
+   SAUF la section « Désactiver » (qui porte le bouton Réactiver). */
+#app.disabled-mode main > section:not(.disable-section),
+#app.disabled-mode .ctxbar {
+  opacity: 0.45; pointer-events: none;
+}
+#app.disabled-mode .disable-btn { border-color: var(--blue); color: var(--blue); }
+#app.disabled-mode .disable-btn:hover { background: #eff4ff; border-color: var(--blue-dark); color: var(--blue-dark); }

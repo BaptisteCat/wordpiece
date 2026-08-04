@@ -1,0 +1,159 @@
+<!-- Chargé dans le volet Office de Word -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WordPiece</title>
+<link rel="stylesheet" href="taskpane.css" />
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+
+<div id="unsupported" class="hidden pad">
+  <h2>WordPiece</h2>
+  <p>Cette extension doit être ouverte dans Microsoft Word.</p>
+</div>
+
+<div id="app" class="hidden">
+  <main>
+    <!-- Bandeau d'erreur PERSISTANT (diagnostic) : reste affiché tant qu'il y a une erreur -->
+    <div id="errBanner" class="err-banner hidden"></div>
+
+    <!-- Barre supérieure : croix de fermeture (gauche) + bouton d'aide (droite) -->
+    <div class="top-bar">
+      <div class="top-left">
+        <button id="paneClose" class="icon-btn close-x" title="Fermer le volet" aria-label="Fermer le volet">✕</button>
+        <button id="pipErr" class="pip err hidden" title="Des points À CORRIGER — cliquer pour voir" aria-label="Points à corriger">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="#fff" d="M8 1.6 15.2 14.4 0.8 14.4Z"/><rect fill="currentColor" x="7.2" y="6" width="1.6" height="4.2" rx="0.8"/><circle fill="currentColor" cx="8" cy="12" r="0.95"/></svg>
+        </button>
+        <button id="pipWarn" class="pip warn hidden" title="Des points À VÉRIFIER — cliquer pour voir" aria-label="Points à vérifier">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="#fff" d="M8 1.6 15.2 14.4 0.8 14.4Z"/><rect fill="currentColor" x="7.2" y="6" width="1.6" height="4.2" rx="0.8"/><circle fill="currentColor" cx="8" cy="12" r="0.95"/></svg>
+        </button>
+      </div>
+      <div class="top-actions">
+        <button id="undoBtn" class="icon-btn" title="Rien à annuler" aria-label="Annuler la dernière action" disabled>↶</button>
+        <button id="settingsToggle" class="icon-btn" title="Réglages" aria-label="Réglages"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+        <button id="helpToggle" class="icon-btn" title="Aide / mode d'emploi" aria-label="Aide">?</button>
+      </div>
+    </div>
+
+    <!-- Notice (mode d'emploi) — masquée par défaut, s'ouvre au clic sur « ? » -->
+    <section id="helpPanel" class="help-panel hidden">
+      <div class="help-head">
+        <strong>Mode d'emploi</strong>
+        <button id="helpClose" class="icon-btn sm" title="Fermer" aria-label="Fermer">✕</button>
+      </div>
+
+      <p>WordPiece gère vos pièces comme des <b>variables</b> : une fois insérées dans le texte,
+      elles se <b>renumérotent</b> et se mettent à jour partout (citations et bordereau) après
+      un renommage ou une réorganisation.</p>
+
+      <p class="help-sub">Insérer une pièce</p>
+      <p>Placez le curseur dans le texte, puis cliquez « <b>Insérer</b> » sur une pièce de la liste
+      — ou tapez un raccourci directement dans le document.</p>
+
+      <p class="help-sub">Raccourcis dans le texte (taper puis <kbd>Espace</kbd>)</p>
+      <ul class="help-list">
+        <li><code>/pn</code> — nouvelle pièce au prochain numéro</li>
+        <li><code>/pn2</code> — insère une pièce au n°2 et <b>décale</b> les suivantes</li>
+        <li><code>/pn4.</code> — nouvelle sous-pièce sous la pièce 4 (4.1, 4.2…)</li>
+        <li><code>/pn4.2</code> — insère la sous-pièce 4.2 et décale les suivantes</li>
+        <li><code>/p3</code> — cite la pièce 3 (la crée au n°3 si besoin)</li>
+        <li><code>/p4-8</code> — plage 4 à 8 (crée &amp; nomme les pièces manquantes)</li>
+        <li><code>/p5+</code> — « Pièce n°5 et suivantes »</li>
+        <li><code>/pf</code> — formate une ligne libre (ex. « Pièces n°4, 8 et 12 »)</li>
+      </ul>
+      <p class="muted" style="font-size:11px">Astuce : verrouille 🔒 une pièce pour figer son numéro ; les autres se renumérotent autour.</p>
+
+      <p class="help-sub">Renommer &amp; réorganiser</p>
+      <p>Renommez une pièce depuis la liste ou directement dans le bordereau : toutes ses citations
+      suivent. Changez l'ordre avec les flèches ▲▼ (les numéros se recalculent partout), verrouillez 🔒
+      un numéro pour le figer, ou cliquez <b>⇅ Ordre d'apparition</b> pour renuméroter selon l'ordre
+      de citation dans le texte.</p>
+
+      <p class="help-sub">Bordereau</p>
+      <p>« Générer le bordereau » crée la liste des pièces en fin de document ; « Mettre à jour » la
+      régénère. Sa présentation (titre, alignements, tailles, interlignes) se règle dans
+      <b>Réglages ▸ Bordereau</b>.</p>
+
+      <p class="help-sub">Retrouver des pièces existantes</p>
+      <p>« 🔍 Rechercher les pièces existantes » détecte les pièces déjà saisies à la main et les
+      reprend en gestion automatique. La détection est tolérante : <code>Pièce n°5 : Nom</code>,
+      <code>Pièce 5 : Nom</code>, <code>Pièce n°5) Nom</code>, <code>Pièce n°5). Nom</code>,
+      les sous-pièces <code>1.1</code>, le pluriel, « n° » présent ou non, séparateurs variés…
+      Si votre format n'est pas reconnu, ouvrez <b>Format personnalisé…</b> et décrivez-le avec
+      <code>{num}</code> et <code>{nom}</code> (ex. <code>Pièce n°{num} : {nom}</code>).</p>
+    </section>
+
+    <!-- Bandeau affiché quand l'extension est désactivée pour ce document -->
+    <div id="disabledBanner" class="disabled-banner hidden">
+      ⏸ Extension désactivée pour ce document. Les pièces déjà créées restent en place.
+      Utilise « Réactiver pour ce document » en bas pour la rallumer.
+    </div>
+
+    <!-- Barre contextuelle : apparaît quand le curseur est sur une citation -->
+    <div id="ctxBar" class="ctxbar hidden">
+      <div class="ctx-info">
+        <span class="ctx-dot"></span>
+        <span id="ctxLabel"></span>
+      </div>
+      <button id="ctxRemoveBtn" class="mini danger">✕ Retirer ici</button>
+    </div>
+
+    <!-- Pop-up intégrée (overlay flouté couvrant le volet) -->
+    <div id="modal" class="modal-overlay hidden">
+      <div class="modal-card" id="modalCard"></div>
+    </div>
+
+    <!-- Diagnostics « À vérifier » : placés EN HAUT pour être bien visibles -->
+    <section id="diag" class="diag hidden"></section>
+
+    <!-- « + » (nouvelle pièce) et bordereau sur la MÊME ligne ; le champ de nom se déplie dessous -->
+    <section class="add-section">
+      <div class="action-row">
+        <button id="addToggle" class="btn primary add-toggle" title="Nouvelle pièce" aria-label="Nouvelle pièce"><span class="plus">+</span> Nouvelle pièce</button>
+        <div id="bordereauAction" class="bordereau-action"></div>
+      </div>
+      <div id="addRow" class="row hidden">
+        <input id="newPieceName" type="text" placeholder="Intitulé de la pièce (ex. Contrat de bail…)" />
+        <button id="addPieceBtn" class="btn primary" title="Ajouter">✓</button>
+        <button id="addCancel" class="btn" title="Annuler">✕</button>
+      </div>
+      <button id="scanBtn" class="btn outline scan-btn" title="Détecter les pièces déjà présentes dans le document (formats « Pièce n°N : Nom », « Pièce N ) Nom », « 1.1 »…)">🔍 Rechercher les pièces existantes</button>
+      <button id="scanFmtToggle" class="link-btn" type="button" title="Si la détection automatique ne reconnaît pas votre format">Format personnalisé…</button>
+      <div id="scanFmtRow" class="row hidden">
+        <input id="scanFormat" type="text" placeholder="ex. Pièce n°{num} : {nom}" title="Décrivez le format avec {num} (numéro) et {nom} (intitulé), {num} avant {nom}" />
+      </div>
+    </section>
+
+    <!-- Liste des pièces -->
+    <section>
+      <div class="section-head">
+        <h3>Pièces <span id="pieceCount" class="muted"></span></h3>
+      </div>
+      <input id="pieceSearch" class="piece-search hidden" type="text" placeholder="Rechercher (nom ou n°)…" />
+      <div id="listToolbar" class="list-toolbar hidden">
+        <button id="appearanceBtn" class="mini" title="Renuméroter les pièces selon leur ordre d'apparition dans le texte (les pièces verrouillées 🔒 et scannées gardent leur numéro)">⇅ Ordre d'apparition</button>
+        <button id="lockAllBtn" class="mini lock hidden" title="Verrouiller / déverrouiller toutes les pièces (sauf celles détectées par « Rechercher les pièces existantes »)">🔒 Tout verrouiller</button>
+      </div>
+      <div id="pieceList" class="list"></div>
+      <div id="emptyState" class="empty muted hidden">
+        Aucune pièce pour l'instant. Ajoute-en une ci-dessus, puis clique sur
+        « Insérer » pour la citer à l'endroit du curseur.
+      </div>
+    </section>
+
+    <!-- Réglages : déplacés dans une FENÊTRE CENTRALE (settings-dialog.html), ouverte par l'engrenage -->
+
+    <!-- Désactivation de l'extension POUR CE DOCUMENT (n'efface rien) -->
+    <section class="disable-section">
+      <div class="disable-row">
+        <button id="disableBtn" class="btn disable-btn">Désactiver pour ce document</button>
+        <button id="disableInfo" class="icon-btn sm" title="En savoir plus" aria-label="Information">i</button>
+      </div>
+      <div id="disableInfoPanel" class="hint disable-info hidden">
+        Gèle l'extension pour ce document : plus de détection <code>/p</code>, plus de mise à
+        jour automatique. Les pièces, citations et bordereau déjà créés restent intacts.
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="engine.js"></script>
+<script src="taskpane.js"></script>
