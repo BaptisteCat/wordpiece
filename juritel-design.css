@@ -1,0 +1,760 @@
+/* ==========================================================================
+   JURITEL · kit d'esthétique réutilisable                         v1 · 2026-09
+   --------------------------------------------------------------------------
+   Reprend à l'identique le rendu de Juritel (index.html) : palette crème et
+   vert sapin, thème sombre anthracite vert, dégradés, ombres, rayons, Inter
+   et Bodoni Moda, boutons, champs, puces, badges, cartes, fenêtres, tiroir,
+   notification.
+
+   INSTALLATION
+     <link rel="stylesheet" href="juritel-design.css">
+     Les polices Google (Inter, Bodoni Moda) sont importées par ce fichier.
+
+   THÈMES
+     Par défaut : suit le système (clair ou sombre).
+     Forcer :  document.documentElement.dataset.theme = 'dark' | 'light'
+     Revenir à l'automatique :  delete document.documentElement.dataset.theme
+
+   ÉCHELLE GRANDS ÉCRANS (facultatif, comme Juritel)
+     <html data-jt-scale="auto">  agrandit tout l'écran par paliers
+     au-delà de 1500, 1800 et 2200 px, et élargit le conteneur.
+
+   ICÔNES
+     Juritel utilise le jeu Lucide (lucide.dev) : viewBox 24, trait 2,
+     extrémités arrondies, couleur currentColor. Tailles usuelles 13 à 17 px.
+
+   CATALOGUE DES CLASSES
+     Mise en page   .jt-header .jt-wrap .jt-main .jt-grid .jt-brandbar .jt-logo
+     Titres         .jt-hero .jt-hero-sub .jt-title .jt-overline .jt-label
+                    .jt-hint .jt-count
+     Boutons        .jt-btn  .jt-btn--primary  .jt-btn--block
+                    .jt-btn-mini  .jt-btn-soft  .jt-btn-dashed
+                    .jt-iconbtn  .jt-iconbtn--notif  .jt-abtn(--ok|--ko)
+                    .jt-fab  .jt-fab-soft(.is-on)
+     Champs         .jt-input  .jt-input-wrap + .jt-input-action
+                    .jt-search + __lens __input __clear
+     Puces, badges  .jt-chips .jt-chip(.is-on) .jt-chip-soft
+                    .jt-badge(--brand|--amber|--gold|--orange|--cyan|--teal|--neutral)
+                    .jt-score(--good|--bad)(.is-strong)  .jt-status(.is-on|.is-err|.is-work)
+     Cartes         .jt-card(--interactive)  .jt-panel  .jt-tile  .jt-list-item(.is-active)
+                    .jt-accordion (sur <details>)  .jt-group  .jt-row  .jt-contact
+                    .jt-tico(--green|--amber|--grey)  .jt-nav  .jt-snippet  .jt-empty
+     Superpositions dialog.jt-dialog  .jt-drawer + .jt-drawer-backdrop  .jt-toast
+     Utilitaires    .jt-grad-bg  .jt-grad-text  .jt-scroll  .jt-hr
+
+   Les états se posent avec des classes .is-… (is-on, is-open, is-shown…).
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600;650;700;750;800&family=Bodoni+Moda:opsz,wght@6..96,700&display=swap');
+
+
+/* ==========================================================================
+   1. JETONS · thème clair (défaut)
+   ========================================================================== */
+:root{
+  /* fonds — variante WordPiece : gris très clair neutre, presque blanc, sans halos
+     (le crème Juritel d'origine #f5f1e4 / #fffdf6 / #f8f4e8, puis un ivoire
+     intermédiaire #f7f7f3, paraissaient trop jaunes dans le volet Word) */
+  --jt-bg:#f6f6f7;
+  --jt-bg-image:none;
+  --jt-card:#ffffff;          /* surface principale */
+  --jt-card-2:#f2f3f5;        /* surface en retrait : champs, pastilles */
+
+  /* encres */
+  --jt-ink:#0d1f18;           /* texte */
+  --jt-ink-2:#4c5b52;         /* texte secondaire */
+  --jt-ink-3:#8a9188;         /* texte tertiaire, icônes au repos */
+
+  /* filets */
+  --jt-line:#e3e5e8;
+  --jt-line-2:#eeeff1;
+
+  /* marque */
+  --jt-accent:#12513c;        /* vert sapin : liens, focus, états actifs */
+  --jt-accent-2:#0c3a2b;
+  --jt-grad-a:#113e2f;        /* dégradé des boutons primaires, logo, titre */
+  --jt-grad-b:#286e55;        /* variante WordPiece : un peu plus clair que Juritel (#0e3427 → #23604a) */
+  --jt-grad:linear-gradient(135deg, var(--jt-grad-a), var(--jt-grad-b));
+  --jt-cta-ink:#fffdf5;       /* texte posé sur le dégradé */
+  --jt-glow:rgba(11,43,33,.22);
+  --jt-hairline-a:rgba(18,81,60,.45);   /* bordure dégradée au survol des cartes */
+  --jt-hairline-b:rgba(46,125,90,.25);
+  --jt-bar-a:#12513c;         /* barrette verticale des groupes */
+  --jt-bar-b:#2e7d5a;
+  --jt-gold:#a8802a;
+
+  /* puce active (reprend le dégradé de marque en clair) */
+  --jt-chip-a:var(--jt-grad-a);
+  --jt-chip-b:var(--jt-grad-b);
+  --jt-chip-ink:var(--jt-cta-ink);
+  --jt-chip-glow:var(--jt-glow);
+
+  /* titres : aplat en clair, dégradé en sombre */
+  --jt-title-grad:none;
+  --jt-title-color:var(--jt-ink);
+
+  /* états */
+  --jt-ok:#0e7a4c;  --jt-ok-bg:#e5f4ea;
+  --jt-ko:#b23a32;  --jt-ko-bg:#fbeae7;
+
+  /* teintes de catégorie (téléphone, mail, fax dans Juritel) */
+  --jt-green:#0c3a2b;  --jt-green-bg:#e4efe8;
+  --jt-amber:#8a5a1c;  --jt-amber-bg:#f7eedb;
+  --jt-grey:#5a6259;   --jt-grey-bg:#eceef0;
+  --jt-badge-grad:linear-gradient(135deg,#0d3428,#215f4a);
+  --jt-badge-ink:#fffdf5;
+
+  /* ombres */
+  --jt-shadow-s:0 1px 2px rgba(13,31,24,.04), 0 1px 6px rgba(13,31,24,.04);
+  --jt-shadow-m:0 2px 6px rgba(13,31,24,.05), 0 14px 36px rgba(13,31,24,.09);
+  --jt-shadow-l:0 10px 32px rgba(13,31,24,.14), 0 30px 70px rgba(13,31,24,.16);
+  /* boutons flottants secondaires : ombre prise dans la teinte, pas grise */
+  --jt-shadow-float:0 2px 5px rgba(9,45,32,.15), 0 9px 22px rgba(9,45,32,.20);
+  --jt-shadow-float-hover:0 3px 7px rgba(9,45,32,.18), 0 14px 30px rgba(9,45,32,.26);
+  --jt-backdrop:rgba(5,18,13,.42);
+
+  /* rayons */
+  --jt-r-xs:7px;     /* badges, scores */
+  --jt-r-sm:9px;     /* mini-boutons */
+  --jt-r-md:12px;    /* boutons, champs, pastilles */
+  --jt-r-lg:16px;    /* tuiles */
+  --jt-r:18px;       /* cartes */
+  --jt-r-xl:22px;    /* fenêtres */
+  --jt-r-pill:999px;
+
+  /* mouvement */
+  --jt-ease:cubic-bezier(.2,.6,.3,1);
+
+  /* typographie */
+  --jt-font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI Variable Text","Segoe UI",Roboto,sans-serif;
+  --jt-font-display:'Bodoni Moda',Didot,'Bodoni MT','Times New Roman',serif;
+
+  /* mise en page */
+  --jt-maxw:1080px;
+}
+
+
+/* ==========================================================================
+   2. JETONS · thème sombre (système, ou forcé par data-theme="dark")
+   Le bloc est répété à l'identique : c'est la seule façon, en CSS pur, de
+   suivre le système ET de laisser un choix manuel l'emporter dans les deux sens.
+   ========================================================================== */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --jt-bg:#071410;
+    --jt-bg-image:
+      radial-gradient(1000px 480px at 82% -10%, rgba(160,210,180,.06), transparent 60%),
+      radial-gradient(900px 460px at -8% 108%, rgba(46,125,90,.09), transparent 60%);
+    --jt-card:#0e1f19; --jt-card-2:#152b23;
+    --jt-ink:#faf5e6; --jt-ink-2:#9cb3a6; --jt-ink-3:#6e8478;
+    --jt-line:#1e3a2e; --jt-line-2:#16291f;
+    --jt-accent:#4fbe87; --jt-accent-2:#6bd09b;
+    --jt-grad-a:#faf5e6; --jt-grad-b:#c4d5c6;
+    --jt-cta-ink:#08170f;
+    --jt-glow:rgba(160,210,180,.16);
+    --jt-hairline-a:rgba(79,190,135,.5); --jt-hairline-b:rgba(212,169,104,.18);
+    --jt-bar-a:#4fbe87; --jt-bar-b:#9fd98a;
+    --jt-gold:#d4a968;
+    --jt-chip-a:#4fbe87; --jt-chip-b:#86d0a2; --jt-chip-ink:#07170f;
+    --jt-chip-glow:rgba(79,190,135,.3);
+    --jt-title-grad:linear-gradient(115deg,#faf5e6 0%,#dfe8db 55%,#93ae9c 100%);
+    --jt-title-color:transparent;
+    --jt-ok:#4fb880; --jt-ok-bg:#0e2a1f; --jt-ko:#e0736b; --jt-ko-bg:#2b1414;
+    --jt-green:#7eca9e; --jt-green-bg:#14382a;
+    --jt-amber:#e0be84; --jt-amber-bg:#32270f;
+    --jt-grey:#a6b3a9;  --jt-grey-bg:#1b2a22;
+    --jt-badge-grad:linear-gradient(135deg,#4fbe87,#86d0a2); --jt-badge-ink:#07170f;
+    --jt-shadow-s:0 1px 2px rgba(0,0,0,.5);
+    --jt-shadow-m:0 2px 8px rgba(0,0,0,.45), 0 16px 40px rgba(0,0,0,.42);
+    --jt-shadow-l:0 16px 48px rgba(0,0,0,.62);
+    --jt-shadow-float:0 2px 6px rgba(2,14,10,.55), 0 10px 26px rgba(2,14,10,.5);
+    --jt-shadow-float-hover:0 3px 9px rgba(2,14,10,.6), 0 16px 36px rgba(2,14,10,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --jt-bg:#071410;
+  --jt-bg-image:
+    radial-gradient(1000px 480px at 82% -10%, rgba(160,210,180,.06), transparent 60%),
+    radial-gradient(900px 460px at -8% 108%, rgba(46,125,90,.09), transparent 60%);
+  --jt-card:#0e1f19; --jt-card-2:#152b23;
+  --jt-ink:#faf5e6; --jt-ink-2:#9cb3a6; --jt-ink-3:#6e8478;
+  --jt-line:#1e3a2e; --jt-line-2:#16291f;
+  --jt-accent:#4fbe87; --jt-accent-2:#6bd09b;
+  --jt-grad-a:#faf5e6; --jt-grad-b:#c4d5c6;
+  --jt-cta-ink:#08170f;
+  --jt-glow:rgba(160,210,180,.16);
+  --jt-hairline-a:rgba(79,190,135,.5); --jt-hairline-b:rgba(212,169,104,.18);
+  --jt-bar-a:#4fbe87; --jt-bar-b:#9fd98a;
+  --jt-gold:#d4a968;
+  --jt-chip-a:#4fbe87; --jt-chip-b:#86d0a2; --jt-chip-ink:#07170f;
+  --jt-chip-glow:rgba(79,190,135,.3);
+  --jt-title-grad:linear-gradient(115deg,#faf5e6 0%,#dfe8db 55%,#93ae9c 100%);
+  --jt-title-color:transparent;
+  --jt-ok:#4fb880; --jt-ok-bg:#0e2a1f; --jt-ko:#e0736b; --jt-ko-bg:#2b1414;
+  --jt-green:#7eca9e; --jt-green-bg:#14382a;
+  --jt-amber:#e0be84; --jt-amber-bg:#32270f;
+  --jt-grey:#a6b3a9;  --jt-grey-bg:#1b2a22;
+  --jt-badge-grad:linear-gradient(135deg,#4fbe87,#86d0a2); --jt-badge-ink:#07170f;
+  --jt-shadow-s:0 1px 2px rgba(0,0,0,.5);
+  --jt-shadow-m:0 2px 8px rgba(0,0,0,.45), 0 16px 40px rgba(0,0,0,.42);
+  --jt-shadow-l:0 16px 48px rgba(0,0,0,.62);
+  --jt-shadow-float:0 2px 6px rgba(2,14,10,.55), 0 10px 26px rgba(2,14,10,.5);
+  --jt-shadow-float-hover:0 3px 9px rgba(2,14,10,.6), 0 16px 36px rgba(2,14,10,.55);
+}
+
+
+/* ==========================================================================
+   3. BASE
+   ========================================================================== */
+*, *::before, *::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; min-height:100vh;
+  font-family:var(--jt-font);
+  font-size:14.5px; line-height:1.5; letter-spacing:-.011em;
+  font-feature-settings:"tnum","cv05";        /* chiffres tabulaires, « l » à queue */
+  color:var(--jt-ink);
+  background-color:var(--jt-bg); background-image:var(--jt-bg-image);
+  background-attachment:fixed; background-repeat:no-repeat;
+}
+button, input, select, textarea{font-family:inherit}
+::selection{background:color-mix(in srgb, var(--jt-accent) 25%, transparent)}
+
+/* échelle grands écrans (facultative) */
+:root[data-jt-scale="auto"]{--jt-maxw:1080px}
+@media (min-width:1500px){ :root[data-jt-scale="auto"]{--jt-maxw:1200px; zoom:1.10} }
+@media (min-width:1800px){ :root[data-jt-scale="auto"]{--jt-maxw:1320px; zoom:1.20} }
+@media (min-width:2200px){ :root[data-jt-scale="auto"]{--jt-maxw:1440px; zoom:1.30} }
+
+
+/* ==========================================================================
+   4. MISE EN PAGE
+   ========================================================================== */
+/* en-tête collant, verre dépoli */
+.jt-header{
+  position:sticky; top:0; z-index:20; padding:14px 18px 12px;
+  padding-top:calc(14px + env(safe-area-inset-top, 0px));
+  background:color-mix(in srgb, var(--jt-bg) 76%, transparent);
+  -webkit-backdrop-filter:blur(18px) saturate(1.5); backdrop-filter:blur(18px) saturate(1.5);
+  border-bottom:1px solid var(--jt-line);
+}
+.jt-wrap{max-width:var(--jt-maxw); margin:0 auto}
+.jt-main{max-width:var(--jt-maxw); margin:0 auto; padding:16px 18px}
+.jt-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:12px}
+
+/* barre de marque : logo + nom + sous-titre + boutons */
+.jt-brandbar{display:flex; align-items:center; gap:12px}
+.jt-brandbar h1{margin:0; font-size:16.5px; font-weight:750; letter-spacing:-.02em; flex:1; min-width:0}
+.jt-brandbar h1 small{
+  display:block; margin-top:1px; font-size:11.5px; font-weight:500; color:var(--jt-ink-3);
+  letter-spacing:-.005em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.jt-logo{
+  width:38px; height:38px; border-radius:12px; flex-shrink:0;
+  background:var(--jt-grad); color:var(--jt-cta-ink);
+  display:grid; place-items:center; box-shadow:0 4px 14px var(--jt-glow);
+  transition:transform .2s var(--jt-ease), box-shadow .2s;
+}
+a.jt-logo:hover, button.jt-logo:hover{transform:scale(1.06) rotate(-2deg); box-shadow:0 6px 20px var(--jt-glow)}
+
+
+/* ==========================================================================
+   5. TYPOGRAPHIE
+   ========================================================================== */
+/* grand nom de marque : didone Bodoni, dégradé, filet dessous */
+.jt-hero{
+  margin:0; text-align:center;
+  font-family:var(--jt-font-display); font-weight:700;
+  font-size:clamp(35px, 4.7vw, 52px); letter-spacing:-.012em; line-height:1.05;
+  background:var(--jt-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.jt-hero::after{
+  content:''; display:block; width:138px; height:1.5px; margin:12px auto 0; border-radius:1px;
+  background:linear-gradient(90deg, var(--jt-grad-a), var(--jt-grad-b)); opacity:.5;
+}
+.jt-hero-sub{
+  margin:10px 0 0; text-align:center; font-size:10.5px; font-weight:650; color:var(--jt-ink-3);
+  text-transform:uppercase; letter-spacing:.18em;
+}
+/* titre de fiche ou de carte : aplat en clair, dégradé crème en sombre */
+.jt-title{
+  margin:0; font-size:19px; font-weight:750; letter-spacing:-.025em;
+  background:var(--jt-title-grad); -webkit-background-clip:text; background-clip:text;
+  color:var(--jt-title-color);
+}
+/* surtitre de rubrique */
+.jt-overline{
+  display:flex; align-items:center; gap:8px; margin:26px 4px 12px;
+  font-size:11.5px; font-weight:700; color:var(--jt-ink-2);
+  text-transform:uppercase; letter-spacing:.08em;
+}
+.jt-overline:first-child{margin-top:4px}
+/* étiquette de champ */
+.jt-label{
+  display:block; margin:13px 0 6px; font-size:11px; font-weight:650; color:var(--jt-ink-2);
+  text-transform:uppercase; letter-spacing:.06em;
+}
+.jt-hint{font-size:12px; color:var(--jt-ink-3); line-height:1.55; letter-spacing:-.005em}
+.jt-count{font-size:10.5px; font-weight:600; color:var(--jt-ink-3); letter-spacing:0; text-transform:none}
+
+
+/* ==========================================================================
+   6. BOUTONS
+   ========================================================================== */
+/* secondaire (par défaut) */
+.jt-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:11px 20px; border-radius:var(--jt-r-md); border:1px solid var(--jt-line);
+  background:var(--jt-card); color:var(--jt-ink);
+  font-size:13.5px; font-weight:600; letter-spacing:-.01em; text-decoration:none;
+  cursor:pointer; transition:all .18s var(--jt-ease);
+}
+.jt-btn:hover{box-shadow:var(--jt-shadow-s); transform:translateY(-1px)}
+/* primaire : dégradé de marque et halo */
+.jt-btn--primary{
+  background:var(--jt-grad); color:var(--jt-cta-ink); border-color:transparent;
+  box-shadow:0 4px 14px var(--jt-glow);
+}
+.jt-btn--primary:hover{box-shadow:0 6px 20px var(--jt-glow)}
+.jt-btn--block{display:flex; width:100%}
+.jt-btn:disabled, .jt-btn[aria-disabled="true"]{opacity:.5; cursor:not-allowed; transform:none; box-shadow:none}
+
+/* discret, sans cadre (actions secondaires dans une carte) */
+.jt-btn-mini{
+  display:inline-flex; align-items:center; gap:5px; padding:6px 10px;
+  border:none; border-radius:var(--jt-r-sm); background:none; color:var(--jt-ink-3);
+  font-size:12px; font-weight:600; letter-spacing:-.005em; cursor:pointer; transition:all .15s;
+}
+.jt-btn-mini:hover{background:var(--jt-line-2); color:var(--jt-ink); transform:translateY(-1px)}
+.jt-btn-mini.is-on{background:var(--jt-ok-bg); color:var(--jt-ok)}
+
+/* doux : lien sortant, action de second rang dans un bloc */
+.jt-btn-soft{
+  display:inline-flex; align-items:center; gap:7px; padding:8px 13px;
+  border:1px solid var(--jt-line); border-radius:11px; background:var(--jt-card-2); color:var(--jt-ink-2);
+  font-size:12.5px; font-weight:600; letter-spacing:-.01em; text-decoration:none; cursor:pointer;
+  transition:all .16s;
+}
+.jt-btn-soft:hover{
+  border-color:color-mix(in srgb, var(--jt-accent) 40%, var(--jt-line));
+  color:var(--jt-ink); transform:translateY(-1px); box-shadow:var(--jt-shadow-s);
+}
+
+/* pointillé pleine largeur (« afficher plus ») */
+.jt-btn-dashed{
+  display:block; width:100%; padding:14px; margin:16px 0;
+  border:1.5px dashed var(--jt-line); border-radius:var(--jt-r); background:none; color:var(--jt-accent);
+  font-size:13.5px; font-weight:600; cursor:pointer; transition:all .18s;
+}
+.jt-btn-dashed:hover{background:var(--jt-card); border-color:var(--jt-accent); transform:translateY(-1px)}
+
+/* bouton icône carré (en-tête) */
+.jt-iconbtn{
+  width:38px; height:38px; flex-shrink:0; display:grid; place-items:center;
+  border:1px solid var(--jt-line); border-radius:12px; background:var(--jt-card); color:var(--jt-ink-2);
+  cursor:pointer; transition:all .18s var(--jt-ease);
+}
+.jt-iconbtn:hover{
+  color:var(--jt-ink); box-shadow:var(--jt-shadow-s); transform:translateY(-2px);
+  border-color:color-mix(in srgb, var(--jt-accent) 35%, var(--jt-line));
+}
+.jt-iconbtn--sm{width:32px; height:32px; border-radius:10px}
+.jt-iconbtn--notif{position:relative}
+.jt-iconbtn--notif::after{
+  content:''; position:absolute; top:6px; right:6px; width:9px; height:9px;
+  border-radius:50%; background:var(--jt-ko); border:2px solid var(--jt-card);
+}
+
+/* petite action en ligne (valider / refuser / copier) */
+.jt-abtn{
+  width:27px; height:27px; display:grid; place-items:center;
+  border:1px solid transparent; border-radius:8px; background:none; color:var(--jt-ink-3);
+  cursor:pointer; transition:all .14s var(--jt-ease);
+}
+.jt-abtn:hover{background:var(--jt-line-2); color:var(--jt-ink); transform:scale(1.1)}
+.jt-abtn--ok:hover{background:var(--jt-ok-bg); color:var(--jt-ok)}
+.jt-abtn--ko:hover{background:var(--jt-ko-bg); color:var(--jt-ko)}
+
+/* bouton flottant principal (bas droite) */
+.jt-fab{
+  position:fixed; right:22px; bottom:22px; z-index:30;
+  height:52px; padding:0 22px 0 18px; display:flex; align-items:center; gap:8px;
+  border:none; border-radius:26px; background:var(--jt-grad); color:var(--jt-cta-ink);
+  font-size:14px; font-weight:650; letter-spacing:-.01em; cursor:pointer;
+  box-shadow:0 8px 26px var(--jt-glow), var(--jt-shadow-m);
+  transition:all .22s var(--jt-ease);
+}
+.jt-fab:hover{transform:translateY(-3px) scale(1.03); box-shadow:0 12px 34px var(--jt-glow), var(--jt-shadow-l)}
+@media (max-width:560px){ .jt-fab{width:52px; padding:0; justify-content:center} .jt-fab b{display:none} }
+
+/* bouton flottant secondaire : voile de marque, ombre teintée */
+.jt-fab-soft{
+  width:52px; height:44px; display:grid; place-items:center;
+  border:1px solid var(--jt-line); border-radius:22px; color:var(--jt-ink-2); cursor:pointer;
+  background:linear-gradient(135deg, color-mix(in srgb, var(--jt-accent) 16%, var(--jt-card)), var(--jt-card));
+  box-shadow:var(--jt-shadow-float); transition:all .22s var(--jt-ease);
+}
+.jt-fab-soft:hover{transform:translateY(-2px); color:var(--jt-ink); box-shadow:var(--jt-shadow-float-hover)}
+.jt-fab-soft.is-on{background:var(--jt-grad); color:var(--jt-cta-ink); border-color:transparent; box-shadow:0 8px 26px var(--jt-glow)}
+
+/* focus clavier visible sur tous les boutons du kit */
+:is(.jt-btn, .jt-btn-mini, .jt-btn-soft, .jt-btn-dashed, .jt-iconbtn, .jt-abtn, .jt-fab, .jt-fab-soft, .jt-chip, .jt-chip-soft):focus-visible{
+  outline:2px solid var(--jt-accent); outline-offset:2px;
+}
+
+
+/* ==========================================================================
+   7. CHAMPS
+   ========================================================================== */
+.jt-input{
+  width:100%; padding:11px 13px; font-size:14.5px; color:var(--jt-ink);
+  border:1.5px solid var(--jt-line); border-radius:11px; background:var(--jt-card-2);
+  outline:none; letter-spacing:-.011em; transition:all .18s;
+}
+.jt-input::placeholder{color:var(--jt-ink-3)}
+.jt-input:focus{border-color:var(--jt-accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--jt-accent) 12%, transparent)}
+textarea.jt-input{min-height:90px; resize:vertical; line-height:1.5}
+select.jt-input{cursor:pointer}
+
+/* champ avec action logée à droite (œil du mot de passe, effacer…) */
+.jt-input-wrap{position:relative}
+.jt-input-wrap .jt-input{padding-right:44px}
+.jt-input-wrap .jt-input::-ms-reveal, .jt-input-wrap .jt-input::-ms-clear{display:none}
+.jt-input-action{
+  position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  width:32px; height:32px; display:grid; place-items:center;
+  border:none; border-radius:8px; background:transparent; color:var(--jt-ink-3); cursor:pointer; transition:all .15s;
+}
+.jt-input-action:hover{color:var(--jt-ink); background:var(--jt-line-2)}
+.jt-input-action[aria-pressed="true"]{color:var(--jt-accent)}
+
+/* grande recherche en pilule, balayage de dégradé à la prise de focus */
+.jt-search{position:relative}
+.jt-search__lens{
+  position:absolute; left:16px; top:50%; transform:translateY(-50%);
+  display:grid; place-items:center; color:var(--jt-ink-3); pointer-events:none; transition:color .2s;
+}
+.jt-search:focus-within .jt-search__lens{color:var(--jt-accent)}
+.jt-search__input{
+  width:100%; padding:14px 46px; font-size:15.5px; font-weight:450; color:var(--jt-ink);
+  letter-spacing:-.011em; border:1.5px solid var(--jt-line); border-radius:var(--jt-r-pill);
+  background:var(--jt-card); outline:none; box-shadow:var(--jt-shadow-s); transition:all .2s;
+  -webkit-appearance:none; appearance:none;
+}
+.jt-search__input::placeholder{color:var(--jt-ink-3); font-weight:400}
+.jt-search__input::-webkit-search-cancel-button, .jt-search__input::-webkit-search-decoration{-webkit-appearance:none; display:none}
+.jt-search__input::-ms-clear{display:none}
+.jt-search__input:focus{
+  border-color:var(--jt-accent);
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--jt-accent) 13%, transparent), var(--jt-shadow-m);
+}
+.jt-search:focus-within .jt-search__input{
+  background-image:linear-gradient(100deg,
+    transparent 22%,
+    color-mix(in srgb, var(--jt-bar-a) 15%, transparent) 40%,
+    color-mix(in srgb, var(--jt-accent) 20%, transparent) 50%,
+    color-mix(in srgb, var(--jt-bar-b) 15%, transparent) 60%,
+    transparent 78%);
+  background-size:260% 100%; background-repeat:no-repeat; background-position:-130% 0;
+  animation:jt-sweep 2.8s ease-in-out 1;
+}
+.jt-search__clear{
+  position:absolute; right:9px; top:50%; transform:translateY(-50%);
+  width:28px; height:28px; display:grid; place-items:center;
+  border:none; border-radius:50%; background:var(--jt-line-2); color:var(--jt-ink-2); cursor:pointer;
+  transition:all .15s;
+}
+.jt-search__clear:hover{background:var(--jt-line); color:var(--jt-ink); transform:translateY(-50%) scale(1.08)}
+.jt-search__clear[hidden]{display:none}
+
+
+/* ==========================================================================
+   8. PUCES, BADGES, ÉTATS
+   ========================================================================== */
+.jt-chips{display:flex; gap:7px; flex-wrap:wrap}
+.jt-chips--scroll{flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; overscroll-behavior-x:contain}
+.jt-chips--scroll::-webkit-scrollbar{display:none}
+/* filtre */
+.jt-chip{
+  padding:6px 14px; border:1px solid var(--jt-line); border-radius:20px;
+  background:var(--jt-card); color:var(--jt-ink-2);
+  font-size:12.5px; font-weight:600; letter-spacing:-.005em; white-space:nowrap; cursor:pointer;
+  transition:all .18s var(--jt-ease);
+}
+.jt-chip:hover{border-color:var(--jt-ink-3); color:var(--jt-ink); transform:translateY(-1px); box-shadow:var(--jt-shadow-s)}
+.jt-chip.is-on{
+  background:linear-gradient(135deg, var(--jt-chip-a), var(--jt-chip-b));
+  color:var(--jt-chip-ink); border-color:transparent; box-shadow:0 3px 10px var(--jt-chip-glow);
+}
+/* raccourci doux, avec compteur facultatif */
+.jt-chip-soft{
+  padding:5px 13px; border:1px solid var(--jt-line); border-radius:18px;
+  background:var(--jt-card-2); color:var(--jt-ink-2);
+  font-size:12px; font-weight:600; letter-spacing:-.005em; cursor:pointer;
+  transition:all .16s var(--jt-ease);
+}
+.jt-chip-soft:hover{border-color:var(--jt-accent); color:var(--jt-accent); background:var(--jt-card); transform:translateY(-1px); box-shadow:var(--jt-shadow-s)}
+.jt-chip-soft .n{margin-left:4px; font-size:10.5px; font-weight:600; color:var(--jt-ink-3)}
+
+/* badge de catégorie */
+.jt-badge{
+  display:inline-block; flex-shrink:0; padding:4px 9px; border-radius:var(--jt-r-xs);
+  font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;
+  color:var(--jt-ink-2); background:var(--jt-line-2);
+}
+.jt-badge--brand{color:var(--jt-badge-ink); background:var(--jt-badge-grad)}
+.jt-badge--amber{color:var(--jt-amber); background:var(--jt-amber-bg)}
+.jt-badge--gold{color:var(--jt-gold); background:color-mix(in srgb, var(--jt-gold) 13%, transparent)}
+.jt-badge--orange{color:#b45f19; background:color-mix(in srgb, #c47121 13%, transparent)}
+.jt-badge--cyan{color:#0e7490; background:color-mix(in srgb, #0e7490 12%, transparent)}
+.jt-badge--teal{color:#0f8a68; background:color-mix(in srgb, #0f8a68 12%, transparent)}
+.jt-badge--neutral{color:var(--jt-ink-2); background:var(--jt-line-2)}
+
+/* score / verdict */
+.jt-score{
+  display:inline-flex; align-items:center; gap:3px; flex-shrink:0; padding:2.5px 8px;
+  border-radius:var(--jt-r-xs); font-size:10.5px; font-weight:700; letter-spacing:0; white-space:nowrap;
+}
+.jt-score--good{color:var(--jt-ok); background:var(--jt-ok-bg)}
+.jt-score--bad{color:var(--jt-ko); background:var(--jt-ko-bg)}
+.jt-score--good.is-strong{color:var(--jt-bg); background:var(--jt-ok)}
+.jt-score--bad.is-strong{color:var(--jt-bg); background:var(--jt-ko)}
+
+/* pastille d'état avec point lumineux */
+.jt-status{
+  display:inline-flex; align-items:center; gap:7px; padding:6px 12px;
+  border:1px solid var(--jt-line); border-radius:20px; background:var(--jt-card);
+  font-size:12px; font-weight:550; color:var(--jt-ink-3); transition:all .2s;
+}
+.jt-status::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--jt-ink-3); transition:all .2s}
+.jt-status.is-on::before{background:var(--jt-ok); box-shadow:0 0 0 3px color-mix(in srgb, var(--jt-ok) 22%, transparent)}
+.jt-status.is-err::before{background:var(--jt-ko)}
+.jt-status.is-work::before{background:var(--jt-gold); animation:jt-pulse 1s infinite}
+
+
+/* ==========================================================================
+   9. CARTES ET LISTES
+   ========================================================================== */
+.jt-card{
+  position:relative; min-width:0; padding:16px 18px;
+  background:var(--jt-card); border:1px solid var(--jt-line); border-radius:var(--jt-r);
+  box-shadow:var(--jt-shadow-s);
+}
+/* carte cliquable : s'élève et révèle une bordure dégradée */
+.jt-card--interactive{cursor:pointer; transition:all .22s var(--jt-ease)}
+.jt-card--interactive:hover{box-shadow:var(--jt-shadow-m); transform:translateY(-3px)}
+.jt-card--interactive::after{
+  content:''; position:absolute; inset:0; border-radius:inherit; padding:1.5px; pointer-events:none;
+  background:linear-gradient(135deg, var(--jt-hairline-a), var(--jt-hairline-b) 55%, transparent);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; transition:opacity .25s;
+}
+.jt-card--interactive:hover::after{opacity:1}
+
+/* panneau d'en-tête (fiche) : léger dégradé de surface */
+.jt-panel{
+  padding:18px 20px; border:1px solid var(--jt-line); border-radius:var(--jt-r);
+  background:linear-gradient(160deg, var(--jt-card) 55%, color-mix(in srgb, var(--jt-card-2) 80%, var(--jt-card)) 100%);
+  box-shadow:var(--jt-shadow-s);
+}
+
+/* tuile d'action : pastille dégradée + titre + indication */
+.jt-tile{
+  display:flex; flex-direction:column; align-items:flex-start; gap:3px;
+  padding:16px 16px 15px; text-align:left; cursor:pointer;
+  border:1px solid var(--jt-line); border-radius:var(--jt-r-lg); background:var(--jt-card);
+  color:var(--jt-ink); box-shadow:var(--jt-shadow-s); transition:all .2s var(--jt-ease);
+}
+.jt-tile:hover{transform:translateY(-3px); box-shadow:var(--jt-shadow-m); border-color:color-mix(in srgb, var(--jt-accent) 38%, var(--jt-line))}
+.jt-tile__icon{
+  width:36px; height:36px; margin-bottom:7px; display:grid; place-items:center; border-radius:11px;
+  background:var(--jt-grad); color:var(--jt-cta-ink);
+}
+.jt-tile b{font-size:14px; font-weight:650; letter-spacing:-.012em}
+.jt-tile .jt-hint{font-size:12px}
+@media (max-width:760px){
+  .jt-tile{flex-direction:row; align-items:center; gap:12px; padding:12px 14px}
+  .jt-tile__icon{margin-bottom:0; width:34px; height:34px; flex-shrink:0}
+}
+
+/* élément de liste en carte (panneau d'outils) */
+.jt-list-item{
+  display:flex; align-items:center; gap:11px; padding:12px 13px; margin-bottom:8px;
+  border:1px solid var(--jt-line); border-radius:14px; background:var(--jt-card-2);
+  cursor:pointer; user-select:none; transition:all .16s;
+}
+.jt-list-item:hover{border-color:color-mix(in srgb, var(--jt-accent) 35%, var(--jt-line)); box-shadow:var(--jt-shadow-s); transform:translateY(-1px)}
+.jt-list-item.is-active{border-color:color-mix(in srgb, var(--jt-ok) 45%, var(--jt-line)); background:var(--jt-ok-bg)}
+.jt-list-item__text{flex:1; min-width:0}
+.jt-list-item__text b{display:block; font-size:13.5px; font-weight:650; letter-spacing:-.01em}
+.jt-list-item__text small{display:block; margin-top:1px; font-size:11.5px; color:var(--jt-ink-3)}
+
+/* section repliable : à poser sur <details><summary>…</summary>…</details> */
+.jt-accordion{
+  margin-bottom:12px; overflow:hidden; background:var(--jt-card);
+  border:1px solid var(--jt-line); border-radius:var(--jt-r); box-shadow:var(--jt-shadow-s);
+  transition:box-shadow .2s;
+}
+.jt-accordion:hover{box-shadow:var(--jt-shadow-m)}
+.jt-accordion > summary{
+  display:flex; align-items:center; gap:9px; padding:13px 17px; list-style:none;
+  font-size:12px; font-weight:700; color:var(--jt-ink); text-transform:uppercase; letter-spacing:.07em;
+  cursor:pointer; user-select:none; transition:background .15s;
+}
+.jt-accordion > summary::-webkit-details-marker{display:none}
+.jt-accordion > summary:hover{background:var(--jt-card-2)}
+.jt-accordion > summary::before{
+  content:''; width:7px; height:7px; margin:0 3px 0 1px; flex-shrink:0;
+  border-right:2px solid var(--jt-ink-3); border-bottom:2px solid var(--jt-ink-3);
+  transform:rotate(-45deg); transition:transform .25s var(--jt-ease);
+}
+.jt-accordion[open] > summary{color:var(--jt-accent); border-bottom:1px solid var(--jt-line-2)}
+.jt-accordion[open] > summary::before{transform:rotate(45deg)}
+.jt-accordion[open] > :not(summary){animation:jt-reveal .25s var(--jt-ease)}
+
+/* groupe dans une section : titre à barrette dégradée */
+.jt-group{padding:4px 0}
+.jt-group > h4{
+  display:flex; align-items:center; gap:8px; margin:0; padding:11px 17px 4px;
+  font-size:13px; font-weight:650; color:var(--jt-ink); letter-spacing:-.01em;
+}
+.jt-group > h4::before{
+  content:''; width:3px; height:14px; border-radius:2px; flex-shrink:0;
+  background:linear-gradient(180deg, var(--jt-bar-a), var(--jt-bar-b));
+}
+
+/* ligne libellé / valeurs, fond alterné */
+.jt-row{
+  display:grid; grid-template-columns:minmax(150px, 2fr) 3fr; gap:4px 18px; align-items:start;
+  padding:11px 17px; border-top:1px solid var(--jt-line-2);
+}
+.jt-row:first-child{border-top:none}
+.jt-accordion .jt-row:nth-child(even){background:color-mix(in srgb, var(--jt-ink-3) 8%, transparent)}
+.jt-group .jt-row{padding-left:30px}
+.jt-row__label{padding-top:6px; font-size:13px; font-weight:550; color:var(--jt-ink); letter-spacing:-.008em; overflow-wrap:break-word}
+.jt-row__note{display:block; margin-top:3px; font-size:11.5px; font-weight:450; font-style:italic; color:var(--jt-ink-3)}
+.jt-row__values{display:flex; flex-wrap:wrap; gap:7px; align-items:center; min-width:0}
+@media (max-width:640px){
+  .jt-row{grid-template-columns:1fr; gap:3px; padding:10px 13px}
+  .jt-group .jt-row{padding-left:22px}
+  .jt-row__label{padding-top:0}
+}
+
+/* pastille de coordonnée : icône teintée + valeur + actions */
+.jt-contact{
+  display:inline-flex; align-items:center; gap:8px; min-width:0; padding:5px 10px 5px 6px;
+  border:1px solid var(--jt-line-2); border-radius:12px; background:var(--jt-card-2);
+  transition:all .16s var(--jt-ease);
+}
+.jt-contact:hover{border-color:color-mix(in srgb, var(--jt-accent) 30%, var(--jt-line)); box-shadow:var(--jt-shadow-s); background:var(--jt-card); transform:translateY(-1px)}
+.jt-contact a, .jt-contact__value{
+  font-size:13.5px; font-weight:600; color:var(--jt-ink); text-decoration:none; letter-spacing:0;
+  font-variant-numeric:tabular-nums; word-break:break-all; min-width:0; transition:color .15s;
+}
+.jt-contact a:hover{color:var(--jt-accent)}
+.jt-contact.is-dead{opacity:.42}
+.jt-tico{width:26px; height:26px; flex-shrink:0; display:grid; place-items:center; border-radius:8px}
+.jt-tico--green{background:var(--jt-green-bg); color:var(--jt-green)}
+.jt-tico--amber{background:var(--jt-amber-bg); color:var(--jt-amber)}
+.jt-tico--grey{background:var(--jt-grey-bg); color:var(--jt-grey)}
+.jt-tico--brand{background:var(--jt-grad); color:var(--jt-cta-ink)}
+
+/* sommaire latéral */
+.jt-nav{padding:8px; background:var(--jt-card); border:1px solid var(--jt-line); border-radius:var(--jt-r); box-shadow:var(--jt-shadow-s)}
+.jt-nav a{
+  display:flex; align-items:center; gap:8px; padding:8px 11px; border-radius:10px;
+  font-size:12.5px; font-weight:550; color:var(--jt-ink-2); text-decoration:none; letter-spacing:-.005em;
+  cursor:pointer; transition:all .14s;
+}
+.jt-nav a:hover{background:var(--jt-card-2); color:var(--jt-ink); transform:translateX(2px)}
+.jt-nav a.is-active{background:var(--jt-card-2); color:var(--jt-accent)}
+.jt-nav a .jt-count{margin-left:auto}
+
+/* extrait mis en évidence */
+.jt-snippet{padding:7px 10px; border-radius:9px; background:var(--jt-card-2); font-size:12px; color:var(--jt-ink-2)}
+.jt-snippet b{color:var(--jt-accent); font-weight:600}
+
+/* état vide */
+.jt-empty{padding:70px 10px; text-align:center; color:var(--jt-ink-3)}
+
+
+/* ==========================================================================
+   10. SUPERPOSITIONS
+   ========================================================================== */
+/* fenêtre modale : <dialog class="jt-dialog"><div class="jt-dialog__body">… */
+dialog.jt-dialog{
+  width:calc(100vw - 32px); max-width:500px; max-height:88vh; margin:auto; padding:0; overflow:hidden;
+  border:none; border-radius:var(--jt-r-xl); background:var(--jt-card); color:var(--jt-ink);
+  box-shadow:var(--jt-shadow-l);
+}
+dialog.jt-dialog::backdrop{
+  background:var(--jt-backdrop);
+  -webkit-backdrop-filter:blur(9px) saturate(.9); backdrop-filter:blur(9px) saturate(.9);
+}
+dialog.jt-dialog[open]{animation:jt-reveal .25s var(--jt-ease)}
+.jt-dialog--wide{max-width:min(1120px, 96vw) !important; width:96vw !important}
+.jt-dialog__body{padding:24px; max-height:88vh; overflow-y:auto; overscroll-behavior:contain}
+.jt-dialog__body h2{margin:0 0 18px; font-size:17px; font-weight:750; letter-spacing:-.02em}
+.jt-dialog__head{display:flex; align-items:center; gap:11px; margin-bottom:16px}
+.jt-dialog__head h2{flex:1; min-width:0; margin:0}
+.jt-dialog__actions{display:flex; justify-content:flex-end; gap:8px; margin-top:22px}
+@media (max-width:640px){ dialog.jt-dialog{margin:10px auto auto; max-height:calc(100dvh - 20px)} }
+
+/* tiroir latéral droit + voile */
+.jt-drawer-backdrop{
+  position:fixed; inset:0; z-index:38; background:rgba(5,18,13,.45);
+  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+  opacity:0; pointer-events:none; transition:opacity .25s;
+}
+.jt-drawer-backdrop.is-open{opacity:1; pointer-events:auto}
+.jt-drawer{
+  position:fixed; top:0; right:0; bottom:0; z-index:39; width:min(390px, 94vw); padding:16px; overflow-y:auto;
+  background:var(--jt-card); border-left:1px solid var(--jt-line); box-shadow:var(--jt-shadow-l);
+  transform:translateX(105%); transition:transform .3s var(--jt-ease);
+}
+.jt-drawer.is-open{transform:none}
+.jt-drawer__head{display:flex; align-items:center; gap:10px; margin-bottom:16px}
+.jt-drawer__head b{flex:1; font-size:16px; font-weight:750; letter-spacing:-.02em}
+.jt-drawer__icon{width:34px; height:34px; display:grid; place-items:center; border-radius:10px; background:var(--jt-grad); color:var(--jt-cta-ink)}
+
+/* notification éphémère */
+.jt-toast{
+  position:fixed; left:50%; bottom:calc(32px + env(safe-area-inset-bottom, 0px)); z-index:40;
+  max-width:90vw; padding:12px 22px; border-radius:14px; text-align:center;
+  background:var(--jt-grad); color:var(--jt-cta-ink);
+  font-size:13.5px; font-weight:550; letter-spacing:-.01em;
+  box-shadow:0 8px 26px var(--jt-glow), var(--jt-shadow-l);
+  opacity:0; pointer-events:none; transform:translateX(-50%) translateY(8px);
+  transition:all .25s var(--jt-ease);
+}
+.jt-toast.is-shown{opacity:1; transform:translateX(-50%) translateY(0)}
+
+
+/* ==========================================================================
+   11. UTILITAIRES
+   ========================================================================== */
+.jt-grad-bg{background:var(--jt-grad); color:var(--jt-cta-ink)}
+.jt-grad-text{background:var(--jt-grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+.jt-hr{border:none; border-top:1px solid var(--jt-line); margin:18px 0}
+/* ascenseur discret : rail invisible, pouce arrondi flottant */
+.jt-scroll, .jt-dialog__body, .jt-drawer, .jt-nav{
+  scrollbar-width:thin; scrollbar-color:color-mix(in srgb, var(--jt-ink-3) 45%, transparent) transparent;
+}
+.jt-scroll::-webkit-scrollbar, .jt-dialog__body::-webkit-scrollbar, .jt-drawer::-webkit-scrollbar, .jt-nav::-webkit-scrollbar{width:10px; height:10px}
+.jt-scroll::-webkit-scrollbar-track, .jt-dialog__body::-webkit-scrollbar-track, .jt-drawer::-webkit-scrollbar-track, .jt-nav::-webkit-scrollbar-track{background:transparent}
+.jt-scroll::-webkit-scrollbar-thumb, .jt-dialog__body::-webkit-scrollbar-thumb, .jt-drawer::-webkit-scrollbar-thumb, .jt-nav::-webkit-scrollbar-thumb{
+  background:color-mix(in srgb, var(--jt-ink-3) 42%, transparent);
+  border:3px solid transparent; background-clip:content-box; border-radius:999px;
+}
+
+
+/* ==========================================================================
+   12. ANIMATIONS
+   ========================================================================== */
+@keyframes jt-reveal{from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none}}
+@keyframes jt-pulse{50%{opacity:.25}}
+@keyframes jt-sweep{0%{background-position:130% 0} 100%{background-position:-130% 0}}
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{animation-duration:.01ms !important; transition-duration:.01ms !important}
+}
