@@ -1,0 +1,755 @@
+/* ==========================================================================
+   WordPiece · volet — esthétique Juritel
+   Toutes les couleurs, ombres et rayons viennent des jetons --jt-* de
+   juritel-design.css (chargé AVANT ce fichier) : clair et sombre gratuits.
+   Les noms de classes sont ceux générés par taskpane.js — ne pas les renommer.
+   ========================================================================== */
+
+/* Le volet est étroit (~320 px) : on garde une base plus dense que le kit (14,5 px). */
+body { font-size: 13px; }
+
+.hidden { display: none !important; }
+.muted { color: var(--jt-ink-3); font-weight: 450; }
+.pad { padding: 16px; }
+
+main { padding: 0 12px 16px; }
+section { margin-bottom: 14px; }
+
+.card {
+  background: var(--jt-card);
+  border: 1px solid var(--jt-line);
+  border-radius: var(--jt-r-lg);
+  padding: 10px;
+  box-shadow: var(--jt-shadow-s);
+}
+
+.row { display: flex; gap: 6px; }
+.row input { flex: 1; }
+
+/* Icônes Lucide injectées en SVG (trait 2, currentColor) — taille fixée par width/height */
+.ic { display: block; flex: none; }
+
+/* ---------- En-tête collant, verre dépoli ---------- */
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  position: sticky; top: 0; z-index: 100;
+  margin: 0 -12px 12px; padding: 10px 12px;
+  background: color-mix(in srgb, var(--jt-bg) 76%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5);
+  border-bottom: 1px solid var(--jt-line);
+}
+.top-left { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.top-actions { display: flex; align-items: center; gap: 6px; }
+/* Nom de marque : didone Bodoni en dégradé, comme le « hero » Juritel */
+.brand {
+  font-family: var(--jt-font-display); font-weight: 700; font-size: 18px;
+  letter-spacing: -.012em; line-height: 1; white-space: nowrap;
+  background: var(--jt-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+  padding-bottom: 2px;
+}
+
+/* Bouton icône carré (en-tête, aide, info) */
+.icon-btn {
+  width: 30px; height: 30px; padding: 0; flex: none;
+  display: inline-grid; place-items: center;
+  border: 1px solid var(--jt-line); border-radius: 10px;
+  background: var(--jt-card); color: var(--jt-ink-2);
+  font-size: 13px; font-weight: 700; line-height: 1; cursor: pointer;
+  transition: all .18s var(--jt-ease);
+}
+.icon-btn:hover {
+  color: var(--jt-ink); box-shadow: var(--jt-shadow-s); transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--jt-accent) 35%, var(--jt-line));
+}
+.icon-btn.sm { width: 26px; height: 26px; border-radius: 8px; }
+.icon-btn svg { display: block; }
+.icon-btn:disabled { opacity: .35; cursor: default; }
+.icon-btn:disabled:hover { transform: none; box-shadow: none; color: var(--jt-ink-2); border-color: var(--jt-line); }
+
+/* Croix de fermeture du volet : neutre au repos, rouge au survol */
+.icon-btn.close-x:hover { background: var(--jt-ko-bg); border-color: color-mix(in srgb, var(--jt-ko) 45%, var(--jt-line)); color: var(--jt-ko); }
+
+/* Pastilles d'alerte (visibles quand le bloc « À corriger / À vérifier » est hors écran) */
+.pip {
+  width: 22px; height: 22px; border-radius: 50%; border: none; padding: 0; flex: none;
+  display: inline-grid; place-items: center; cursor: pointer;
+  box-shadow: var(--jt-shadow-s); transition: transform .15s var(--jt-ease);
+}
+.pip:hover { transform: scale(1.08); }
+.pip.err  { background: var(--jt-ko);    color: var(--jt-ko); }    /* color = « ! » évidé dans le triangle blanc */
+/* « À vérifier » : vrai panneau d'avertissement — triangle JAUNE (et non ambre brun), liseré ocre,
+   point d'exclamation sombre, sans disque derrière. Même rendu en clair et en sombre. */
+:root { --wp-warn: #f7b500; --wp-warn-edge: #c98f00; --wp-warn-ink: #3a2a00; }
+.pip.warn { background: transparent; box-shadow: none; color: var(--wp-warn-ink); }
+.pip.warn svg { width: 20px; height: 20px; overflow: visible; }
+.pip.warn svg path { fill: var(--wp-warn); stroke: var(--wp-warn-edge); stroke-width: .7; stroke-linejoin: round; }
+
+/* ---------- Champs ---------- */
+input, select {
+  width: 100%;
+  padding: 8px 11px;
+  border: 1.5px solid var(--jt-line);
+  border-radius: 11px;
+  font-size: 13px; font-family: inherit; letter-spacing: -.011em;
+  background: var(--jt-card-2);
+  color: var(--jt-ink);
+  outline: none;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+}
+input::placeholder { color: var(--jt-ink-3); }
+input:focus, select:focus {
+  border-color: var(--jt-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--jt-accent) 12%, transparent);
+}
+input[type="checkbox"] { accent-color: var(--jt-accent); }
+
+/* ---------- Boutons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: 1px solid var(--jt-line);
+  background: var(--jt-card);
+  color: var(--jt-ink);
+  border-radius: var(--jt-r-md);
+  padding: 8px 12px;
+  font-size: 12.5px; font-weight: 600; letter-spacing: -.01em; font-family: inherit;
+  cursor: pointer;
+  transition: all .18s var(--jt-ease);
+}
+.btn:hover { box-shadow: var(--jt-shadow-s); transform: translateY(-1px); }
+/* Primaire : dégradé de marque et halo */
+.btn.primary {
+  background: var(--jt-grad); color: var(--jt-cta-ink); border-color: transparent;
+  box-shadow: 0 4px 14px var(--jt-glow); min-width: 38px;
+}
+.btn.primary:hover { box-shadow: 0 6px 20px var(--jt-glow); }
+/* « Contour » → bouton doux du kit (surface en retrait, accent au survol) */
+.btn.outline { background: var(--jt-card-2); color: var(--jt-ink-2); }
+.btn.outline:hover {
+  border-color: color-mix(in srgb, var(--jt-accent) 40%, var(--jt-line));
+  color: var(--jt-ink);
+}
+
+:is(.btn, .mini, .icon-btn, .pip, .link-btn):focus-visible {
+  outline: 2px solid var(--jt-accent); outline-offset: 2px;
+}
+
+/* ---------- Ajout d'une pièce + bordereau ---------- */
+.add-section { margin-bottom: 14px; }
+/* « + Nouvelle pièce » et bordereau : deux moitiés équilibrées sur une ligne. Police réduite
+   pour que les libellés complets tiennent, même sur un volet à largeur par défaut (~320 px). */
+.action-row { display: flex; gap: 8px; align-items: stretch; }
+.add-toggle {
+  flex: 1; height: 38px; padding: 0 8px;
+  font-size: 12px; line-height: 1.1;
+}
+.add-toggle .plus { width: 15px; height: 15px; flex: none; }
+.add-section .row { margin-top: 8px; }
+.add-section .row .btn { flex: none; min-width: 38px; }
+
+/* Bouton bordereau : occupe le reste de la ligne, à droite du « + » */
+.bordereau-action { flex: 1; min-width: 0; }
+/* Hauteur fixe → on centre en flex et on annule le padding vertical de .btn
+   (sinon le padding du haut pousse le libellé vers le bas). */
+.bordereau-btn {
+  width: 100%; height: 38px; padding: 0 8px; gap: 5px;
+  font-size: 11.5px; line-height: 1.1;
+}
+.bordereau-row { display: flex; gap: 6px; align-items: stretch; }
+.bordereau-row .bordereau-btn { flex: 1; width: auto; }
+.bordereau-row .mini.trash { height: 38px; width: 38px; margin-left: 0; }
+.scan-btn {
+  width: 100%; height: 38px; padding: 0 10px; margin-top: 8px;
+  line-height: 1.1;
+}
+
+/* Lien discret « Format personnalisé… » sous le bouton de scan */
+.link-btn {
+  background: none; border: none; color: var(--jt-accent);
+  font: inherit; font-size: 11.5px; font-weight: 600; cursor: pointer;
+  padding: 6px 2px 0; text-decoration: underline; text-underline-offset: 2px;
+  text-decoration-color: color-mix(in srgb, var(--jt-accent) 40%, transparent);
+  align-self: flex-start;
+}
+.link-btn:hover { color: var(--jt-accent-2); text-decoration-color: currentColor; }
+
+/* ---------- Liste des pièces ---------- */
+.section-head { display: flex; align-items: center; justify-content: space-between; margin: 20px 2px 10px; }
+/* Titre de rubrique = surtitre du kit */
+h3 {
+  margin: 0; font-size: 11.5px; font-weight: 700; color: var(--jt-ink-2);
+  text-transform: uppercase; letter-spacing: .08em;
+}
+h3 .muted { font-size: 10.5px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+
+/* Recherche dans la liste : pilule du kit */
+.piece-search-wrap { position: relative; margin-bottom: 10px; }
+.piece-search {
+  padding: 9px 38px 9px 15px;
+  border-radius: var(--jt-r-pill); background: var(--jt-card); box-shadow: var(--jt-shadow-s);
+}
+/* Croix d'effacement, visible seulement quand le champ n'est pas vide */
+.piece-search-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 24px; height: 24px; display: grid; place-items: center; padding: 0;
+  border: none; border-radius: 50%; background: var(--jt-line-2); color: var(--jt-ink-2); cursor: pointer;
+  transition: all .15s var(--jt-ease);
+}
+.piece-search-clear:hover { background: var(--jt-line); color: var(--jt-ink); transform: translateY(-50%) scale(1.08); }
+.piece-search-clear:focus-visible { outline: 2px solid var(--jt-accent); outline-offset: 2px; }
+.piece-search:focus { box-shadow: 0 0 0 4px color-mix(in srgb, var(--jt-accent) 13%, transparent), var(--jt-shadow-m); }
+
+/* Barre d'outils de la liste : « Ordre d'apparition » + « Tout verrouiller » */
+/* Une seule ligne : « Tout déverrouiller » (plus long) ne doit pas passer sous « Ordre d'apparition »
+   dans un volet de ~320 px → marges intérieures réduites, pas de retour à la ligne. */
+.list-toolbar { position: relative; display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: nowrap; }
+
+/* Groupes du bouton « Verrous » : empilés AU-DESSUS du bouton, alignés à droite, un peu plus
+   grands que « Valider », par-dessus le contenu. Verrouillé = hachures vertes ; déverrouillé = vert.
+   Flou léger + voile sur tout le volet pendant la sélection ; seuls les groupes et « Valider »
+   restent nets (ils passent au-dessus du voile). */
+.lock-veil {
+  position: fixed; inset: 0; z-index: 150;
+  background: color-mix(in srgb, var(--jt-bg) 45%, transparent);
+  -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px);
+  animation: modal-fade .15s ease-out;
+}
+#lockAllBtn.is-validate { position: relative; z-index: 160; color: var(--jt-cta-ink); background: var(--jt-grad); border-color: transparent; box-shadow: 0 3px 10px var(--jt-glow); }
+#lockAllBtn.is-validate:hover { color: var(--jt-cta-ink); background: var(--jt-grad); box-shadow: 0 5px 16px var(--jt-glow); }
+.drop-menu {
+  position: absolute; bottom: calc(100% + 5px); right: 0; z-index: 160;
+  display: flex; flex-direction: column; align-items: stretch; gap: 7px;
+  animation: jt-reveal .16s var(--jt-ease);
+}
+.drop-item {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%;
+  border: 1.5px solid color-mix(in srgb, var(--jt-accent) 55%, var(--jt-line)); border-radius: 20px;
+  padding: 8px 14px;
+  background: var(--jt-card);
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--jt-ink) 16%, transparent), 0 10px 26px color-mix(in srgb, var(--jt-ink) 20%, transparent);
+  font: inherit; font-size: 12.5px; font-weight: 650; letter-spacing: -.005em; white-space: nowrap; cursor: pointer;
+  transition: all .15s var(--jt-ease);
+}
+.drop-item.is-unlocked { color: var(--jt-accent); }
+/* Groupe verrouillé : même motif que le badge d'une pièce verrouillée — contour en dégradé vert,
+   hachures diagonales vert pâle, texte vert foncé lisible par-dessus. */
+.drop-item.is-locked {
+  color: var(--jt-chip-a);
+  border: 2px solid transparent;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 4px, var(--jt-card) 4px 9px) padding-box,
+    linear-gradient(135deg, color-mix(in srgb, var(--jt-chip-a) 22%, var(--jt-card)), color-mix(in srgb, var(--jt-chip-b) 26%, var(--jt-card))) padding-box,
+    linear-gradient(135deg, color-mix(in srgb, var(--jt-chip-a) 80%, transparent), color-mix(in srgb, var(--jt-chip-b) 80%, transparent)) border-box;
+  text-shadow: 0 0 2px var(--jt-card), 0 0 2px var(--jt-card);
+}
+.drop-item.is-locked:hover, .drop-item.is-locked:focus-visible { border-color: transparent; filter: brightness(1.03); }
+/* Cadenas lisible par-dessus les hachures : halo clair autour du tracé */
+.drop-item.is-locked .ic { filter: drop-shadow(0 0 1px var(--jt-card)) drop-shadow(0 0 1.5px var(--jt-card)) drop-shadow(0 0 1.5px var(--jt-card)); }
+.drop-item.is-unlocked:hover, .drop-item.is-unlocked:focus-visible { border-color: currentColor; outline: none; }
+.drop-item:hover { transform: translateY(-1px); }
+.drop-item:focus-visible { outline: none; }
+.drop-item:disabled { opacity: .5; cursor: default; box-shadow: none; }
+.drop-item:disabled:hover { transform: none; }
+.list-toolbar .mini {
+  border: 1px solid var(--jt-line); border-radius: 18px; padding: 5px 9px; gap: 4px;
+  font-size: 11.5px; white-space: nowrap; flex: 1 1 auto; min-width: 0;
+  background: var(--jt-card-2); color: var(--jt-ink-2);
+}
+.list-toolbar .mini:hover { border-color: var(--jt-accent); color: var(--jt-accent); background: var(--jt-card); box-shadow: var(--jt-shadow-s); }
+
+.list { display: flex; flex-direction: column; gap: 8px; }
+.piece {
+  position: relative;
+  border: 1px solid var(--jt-line);
+  border-radius: 14px;
+  padding: 9px 9px 7px;
+  background: var(--jt-card);
+  box-shadow: var(--jt-shadow-s);
+  transition: box-shadow .2s var(--jt-ease), border-color .2s;
+}
+.piece:hover { box-shadow: var(--jt-shadow-m); border-color: color-mix(in srgb, var(--jt-accent) 22%, var(--jt-line)); }
+/* Flash au réordonnancement (▲▼) : la ligne déplacée s'illumine doucement puis s'estompe */
+@keyframes wp-flash {
+  0%   { background: color-mix(in srgb, var(--jt-accent) 16%, var(--jt-card)); border-color: color-mix(in srgb, var(--jt-accent) 55%, var(--jt-line)); }
+  100% { background: var(--jt-card); border-color: var(--jt-line); }
+}
+.piece.flash { animation: wp-flash 1.8s ease-out; }
+.piece-top { display: flex; align-items: center; gap: 8px; }
+
+/* Pastille de numéro : dégradé de marque (vert), grise quand la pièce est verrouillée */
+.badge, .badge-input {
+  height: 26px; flex: none;
+  background: linear-gradient(135deg, var(--jt-chip-a), var(--jt-chip-b));
+  color: var(--jt-chip-ink);
+  border: none; border-radius: 9px;
+  font-weight: 750; font-size: 12px; letter-spacing: 0;
+  box-shadow: 0 3px 10px var(--jt-chip-glow);
+}
+.badge {
+  min-width: 28px; padding: 0 7px;
+  display: grid; place-items: center; cursor: pointer; user-select: none;
+}
+/* Numéro éditable directement dans le volet */
+.badge-input {
+  width: 46px; padding: 0 4px;
+  text-align: center; font-family: inherit;
+}
+.badge-input:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--jt-accent) 22%, transparent), 0 3px 10px var(--jt-chip-glow);
+}
+.badge-input::selection { background: color-mix(in srgb, var(--jt-chip-ink) 30%, transparent); }
+/* Pièce VERROUILLÉE : même dégradé vert, mais en contour seul (un peu moins opaque) avec des
+   hachures diagonales à l'intérieur — le numéro « figé » se voit sans griser la pièce.
+   Couches (du dessus vers le dessous) : rayures couleur carte (laissent passer des traits fins),
+   dégradé pâli sous les rayures, puis dégradé plein visible seulement dans la bordure. */
+.badge-input.locked {
+  border: 2px solid transparent;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 4px, var(--jt-card) 4px 9px) padding-box,
+    linear-gradient(135deg, color-mix(in srgb, var(--jt-chip-a) 22%, var(--jt-card)), color-mix(in srgb, var(--jt-chip-b) 26%, var(--jt-card))) padding-box,
+    linear-gradient(135deg, color-mix(in srgb, var(--jt-chip-a) 80%, transparent), color-mix(in srgb, var(--jt-chip-b) 80%, transparent)) border-box;
+  color: var(--jt-chip-a);
+  text-shadow: 0 0 2px var(--jt-card), 0 0 2px var(--jt-card);
+  box-shadow: none;
+}
+.badge-input.locked:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--jt-chip-a) 20%, transparent); }
+
+.piece-name {
+  flex: 1; min-width: 0;
+  border: 1.5px solid transparent;
+  background: transparent;
+  padding: 4px 7px;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600; letter-spacing: -.01em;
+}
+.piece-name:hover { border-color: var(--jt-line); }
+.piece-name:focus { border-color: var(--jt-accent); background: var(--jt-card-2); }
+
+/* Nombre d'occurrences : score du kit (neutre ; ambre à zéro) */
+.count {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0;
+  padding: 2.5px 8px;
+  border-radius: var(--jt-r-xs);
+  background: var(--jt-line-2);
+  color: var(--jt-ink-2);
+  white-space: nowrap; flex: none;
+}
+.count.zero { background: var(--jt-amber-bg); color: var(--jt-amber); }
+
+/* Pièce SCANNÉE (déjà présente dans le document) : barrette verte du thème + icône document */
+.piece.scanned::before {
+  content: ''; position: absolute; left: -1px; top: 10px; bottom: 10px; width: 3px; border-radius: 2px;
+  background: linear-gradient(180deg, var(--jt-bar-a), var(--jt-bar-b));
+}
+.scan-mark { flex: none; display: grid; place-items: center; color: var(--jt-gold); cursor: help; }
+
+/* En-tête de GROUPE (N sans nom, suivi de ses sous-pièces N.1, N.2…) : ligne compacte et discrète */
+.piece.group-head {
+  background: var(--jt-card-2); border-style: dashed; box-shadow: none;
+  padding: 6px 8px;
+}
+.piece.group-head:hover { box-shadow: none; }
+.piece.group-head .piece-top { gap: 6px; }
+.group-label {
+  flex: 1; min-width: 0; font-size: 11px; font-weight: 650; color: var(--jt-ink-3);
+  text-transform: uppercase; letter-spacing: .06em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Barre d'actions d'une pièce */
+.piece-actions { display: flex; align-items: center; gap: 2px; margin-top: 6px; flex-wrap: wrap; }
+.mini {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--jt-ink-3);
+  border-radius: var(--jt-r-sm);
+  padding: 5px 8px;
+  font-size: 12px; font-weight: 600; letter-spacing: -.005em; font-family: inherit;
+  cursor: pointer;
+  transition: all .15s var(--jt-ease);
+}
+.mini:hover { background: var(--jt-line-2); color: var(--jt-ink); }
+.mini:disabled { opacity: .35; cursor: not-allowed; }
+.mini:disabled:hover { background: none; color: var(--jt-ink-3); }
+/* « Insérer » : action principale de la ligne, voile de marque */
+.mini.insert { width: 36px; height: 28px; padding: 0; background: color-mix(in srgb, var(--jt-accent) 10%, transparent); color: var(--jt-accent); margin-right: 2px; }
+.mini.insert:hover { background: color-mix(in srgb, var(--jt-accent) 18%, transparent); color: var(--jt-accent); transform: translateY(-1px); }
+.mini.danger:hover { background: var(--jt-ko-bg); color: var(--jt-ko); }
+
+/* Navigation / réordonnancement (loupe, ▲ ▼) : petits boutons icône */
+.mini.nav { width: 28px; height: 28px; padding: 0; }
+
+/* Verrou de numéro : en tête de la barre d'actions, SOUS le badge (même largeur, 46 px) ;
+   la marge droite (46 + 8 = gouttière du haut) aligne « Insérer » sous le nom de la pièce. */
+.mini.lock { width: 28px; height: 28px; padding: 0; }
+.piece-actions > .mini.lock { width: 46px; margin-right: 6px; }
+.mini.lock.on { background: color-mix(in srgb, var(--jt-accent) 12%, transparent); color: var(--jt-accent); }
+/* Le verrou général de la barre d'outils garde son libellé */
+.list-toolbar .mini.lock { width: auto; height: auto; padding: 5px 9px; }
+.list-toolbar .mini.lock.on { background: color-mix(in srgb, var(--jt-accent) 12%, transparent); color: var(--jt-accent); border-color: transparent; }
+/* Pousse un bouton (et ceux qui le suivent) à droite de la barre */
+.mini.push-right { margin-left: auto; }
+
+/* Supprimer : rouge doux au repos, plein au survol */
+.mini.trash { width: 28px; height: 28px; padding: 0; background: var(--jt-ko-bg); color: var(--jt-ko); }
+.mini.trash:hover { background: var(--jt-ko); color: var(--jt-bg); }
+.ic-trash { width: 15px; height: 15px; display: block; }
+
+/* Confirmation de suppression EN LIGNE */
+.piece-actions.confirm { gap: 6px; }
+.confirm-q { font-size: 12px; color: var(--jt-ko); font-weight: 650; margin-right: auto; }
+.mini.trash-solid { background: var(--jt-ko); color: var(--jt-bg); }
+.mini.trash-solid:hover { filter: brightness(1.08); }
+/* Boutons carrés de confirmation (annuler = rouge / valider = vert) */
+.mini.sq { width: 34px; height: 34px; padding: 0; border-radius: 10px; }
+.mini.sq .ic-sq { width: 17px; height: 17px; display: block; }
+.mini.sq.red   { background: var(--jt-ko-bg); color: var(--jt-ko); }
+.mini.sq.red:hover   { background: var(--jt-ko); color: var(--jt-bg); }
+.mini.sq.green { background: var(--jt-ok); color: var(--jt-bg); box-shadow: 0 3px 10px color-mix(in srgb, var(--jt-ok) 30%, transparent); }
+.mini.sq.green:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+/* État vide */
+.empty {
+  padding: 22px 14px; text-align: center; line-height: 1.55;
+  border: 1.5px dashed var(--jt-line); border-radius: var(--jt-r-lg);
+  color: var(--jt-ink-3); font-size: 12px;
+}
+
+/* ---------- Diagnostics : bloc rouge (erreurs) + bloc ambre (à vérifier) ---------- */
+.diag { font-size: 12px; }
+.diag-block {
+  border-radius: var(--jt-r-lg); padding: 11px 12px; border: 1px solid;
+  line-height: 1.45;
+}
+.diag-block + .diag-block { margin-top: 8px; }
+.diag-block strong { font-size: 11px; font-weight: 750; text-transform: uppercase; letter-spacing: .07em; }
+.diag-block.err  { background: var(--jt-ko-bg);    border-color: color-mix(in srgb, var(--jt-ko) 32%, transparent);    color: var(--jt-ko); }
+.diag-block.warn { background: var(--jt-amber-bg); border-color: color-mix(in srgb, var(--jt-amber) 30%, transparent); color: var(--jt-amber); }
+.diag-block ul { margin: 7px 0 0; padding-left: 16px; }
+/* Chaque point de diagnostic : le texte occupe la place, le bouton « Ignorer » reste à droite. */
+.diag-block li { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; }
+.diag-block li:last-child { margin-bottom: 0; }
+.diag-txt { flex: 1; min-width: 0; }
+.diag-ignore {
+  flex: none; align-self: flex-start; margin-left: auto;
+  font-size: 10.5px; padding: 1px 7px; line-height: 1.5; border-radius: 7px;
+  background: transparent; border: 1px solid currentColor; color: inherit; opacity: .7;
+}
+.diag-ignore:hover { opacity: 1; background: color-mix(in srgb, currentColor 10%, transparent); color: inherit; }
+.diag-ignored {
+  margin-top: 8px; font-size: 11px; color: var(--jt-ink-3);
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.diag-ignored .link-btn { padding-top: 0; }
+/* Pop-up « Tout réafficher » : section Ignorés puis section Affichés, bascule point par point */
+.modal-card.wide { max-width: 360px; max-height: calc(100vh - 32px); overflow-y: auto; }
+.wm-sec { margin-top: 12px; }
+.wm-head {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+  font-size: 11px; font-weight: 700; color: var(--jt-ink-2); text-transform: uppercase; letter-spacing: .07em;
+}
+.wm-count { font-size: 10.5px; font-weight: 700; padding: 0 6px; border-radius: var(--jt-r-xs); background: var(--jt-line-2); color: var(--jt-ink-3); letter-spacing: 0; }
+.wm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.wm-row {
+  display: flex; align-items: flex-start; gap: 8px; padding: 7px 8px;
+  border: 1px solid var(--jt-line-2); border-radius: var(--jt-r-sm); background: var(--jt-card-2);
+  font-size: 12px; line-height: 1.4; color: var(--jt-ink);
+}
+.wm-dot { width: 7px; height: 7px; margin-top: 5px; border-radius: 50%; flex: none; }
+.wm-row.err .wm-dot { background: var(--jt-ko); }
+.wm-row.warn .wm-dot { background: var(--wp-warn); }
+.wm-txt { flex: 1; min-width: 0; }
+.wm-row.is-ignored .wm-txt { color: var(--jt-ink-3); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--jt-ink-3) 50%, transparent); }
+.wm-row .diag-ignore { color: var(--jt-ink-2); }
+.wm-row.is-ignored .diag-ignore { color: var(--jt-accent); }
+.wm-empty { font-size: 11.5px; color: var(--jt-ink-3); padding: 2px 2px 4px; }
+.modal-card.wide .modal-btns { margin-top: 16px; }
+/* Ligne « pièces identiques » dans le diagnostic, avec bouton Fusionner */
+.dup-row { display: flex; align-items: center; gap: 8px; justify-content: space-between; margin-top: 6px; }
+.dup-row .mini { flex: none; background: var(--jt-card); color: var(--jt-ink); border: 1px solid var(--jt-line); }
+.dup-row .mini:hover { border-color: var(--jt-accent); color: var(--jt-accent); }
+
+/* Actions */
+.actions { display: flex; flex-direction: column; gap: 6px; }
+.actions .btn { justify-content: flex-start; }
+
+/* ---------- Réglages (vestiges du volet : la fenêtre centrale a son propre style) ---------- */
+summary { cursor: pointer; font-weight: 650; padding: 2px 0; }
+.setting { margin-top: 10px; }
+.setting label {
+  display: block; margin-bottom: 5px; font-size: 11px; font-weight: 650; color: var(--jt-ink-2);
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.hint { font-size: 11.5px; color: var(--jt-ink-3); margin-top: 4px; line-height: 1.55; }
+.hint code, .help-panel code {
+  background: var(--jt-card-2); color: var(--jt-accent);
+  border: 1px solid var(--jt-line-2);
+  padding: 0 5px; border-radius: 5px; font-size: 11px;
+}
+.fs {
+  border: 1px solid var(--jt-line);
+  border-radius: var(--jt-r-lg);
+  padding: 8px 12px 12px;
+  margin: 12px 0 0;
+  background: var(--jt-card);
+}
+.fs legend { font-size: 11px; font-weight: 700; color: var(--jt-ink-2); padding: 0 5px; text-transform: uppercase; letter-spacing: .07em; }
+.fmt-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.fmt-row .align { flex: 1; min-width: 120px; width: auto; }
+.chk {
+  display: inline-flex; align-items: center; gap: 5px;
+  border: 1px solid var(--jt-line);
+  border-radius: 18px;
+  padding: 5px 11px;
+  cursor: pointer; user-select: none;
+  background: var(--jt-card-2); color: var(--jt-ink-2);
+  font-size: 12.5px;
+  transition: all .16s var(--jt-ease);
+}
+.chk:hover { border-color: var(--jt-accent); color: var(--jt-ink); }
+.chk input { width: auto; margin: 0; }
+.chk.sz input { width: 52px; padding: 3px 6px; }
+.fmt-grid { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.fmt-label { min-width: 66px; font-weight: 650; font-size: 11.5px; color: var(--jt-ink-3); }
+.save-note { margin-top: 12px; color: var(--jt-ok); }
+
+/* ---------- Pop-up intégrée au volet : voile flouté + fenêtre ---------- */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+  background: var(--jt-backdrop);
+  -webkit-backdrop-filter: blur(9px) saturate(.9); backdrop-filter: blur(9px) saturate(.9);
+  animation: modal-fade .15s ease-out;
+}
+@keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+.modal-card {
+  background: var(--jt-card); color: var(--jt-ink);
+  border-radius: var(--jt-r-xl); width: 100%; max-width: 310px;
+  box-shadow: var(--jt-shadow-l);
+  padding: 20px; animation: jt-reveal .25s var(--jt-ease);
+}
+.modal-title {
+  font-size: 16px; font-weight: 750; letter-spacing: -.02em; margin-bottom: 8px;
+  background: var(--jt-title-grad); -webkit-background-clip: text; background-clip: text; color: var(--jt-title-color);
+}
+.modal-msg { font-size: 12.5px; line-height: 1.5; color: var(--jt-ink-2); margin-bottom: 18px; }
+.modal-msg b { color: var(--jt-ink); }
+.modal-btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.modal-btns .btn { padding: 8px 14px; }
+
+/* ---------- Notice (mode d'emploi) ---------- */
+.help-panel {
+  background: var(--jt-card);
+  border: 1px solid var(--jt-line);
+  border-radius: var(--jt-r);
+  box-shadow: var(--jt-shadow-m);
+  padding: 12px 15px 15px;
+  margin-bottom: 14px;
+  font-size: 12px; line-height: 1.55; color: var(--jt-ink-2);
+  animation: jt-reveal .25s var(--jt-ease);
+}
+.help-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.help-head strong {
+  font-size: 16px; font-weight: 750; letter-spacing: -.02em;
+  background: var(--jt-title-grad); -webkit-background-clip: text; background-clip: text; color: var(--jt-title-color);
+}
+.help-panel p { margin: 6px 0; }
+.help-panel b { color: var(--jt-ink); font-weight: 650; }
+/* Sous-titre à barrette dégradée (groupe du kit) */
+.help-sub {
+  display: flex; align-items: center; gap: 8px;
+  margin: 14px 0 3px !important; font-size: 12.5px; font-weight: 700; color: var(--jt-ink); letter-spacing: -.01em;
+}
+.help-sub::before {
+  content: ''; width: 3px; height: 13px; border-radius: 2px; flex: none;
+  background: linear-gradient(180deg, var(--jt-bar-a), var(--jt-bar-b));
+}
+.help-list { margin: 4px 0 0; padding-left: 16px; }
+.help-list li { margin: 4px 0; }
+.help-list li::marker { color: var(--jt-ink-3); }
+.help-panel kbd {
+  background: var(--jt-card); border: 1px solid var(--jt-line); border-bottom-width: 2px;
+  border-radius: 5px; padding: 0 5px; font-size: 11px; font-family: inherit; color: var(--jt-ink);
+}
+
+/* ---------- Désactivation pour ce document ---------- */
+.disable-section { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--jt-line); }
+.disable-row { display: flex; align-items: center; gap: 8px; }
+.disable-row .disable-btn { flex: 1; width: auto; min-width: 0; padding: 0 8px; font-size: 12px; white-space: nowrap; }
+.disable-btn { width: 100%; height: 36px; background: transparent; color: var(--jt-ko); border-color: color-mix(in srgb, var(--jt-ko) 30%, var(--jt-line)); }
+.disable-btn:hover { background: var(--jt-ko-bg); border-color: var(--jt-ko); }
+.disable-info { margin-top: 8px; }
+
+.disabled-banner {
+  background: var(--jt-amber-bg); color: var(--jt-amber);
+  border: 1px solid color-mix(in srgb, var(--jt-amber) 30%, transparent);
+  border-radius: var(--jt-r-lg); padding: 11px 12px; font-size: 12px; line-height: 1.45; margin-bottom: 12px;
+}
+
+/* Volet inerte quand l'extension est désactivée : tout est grisé/bloqué
+   SAUF la section « Désactiver » (qui porte le bouton Réactiver). */
+#app.disabled-mode main > section:not(.disable-section),
+#app.disabled-mode .ctxbar {
+  opacity: .45; pointer-events: none;
+}
+#app.disabled-mode .disable-btn { color: var(--jt-accent); border-color: color-mix(in srgb, var(--jt-accent) 40%, var(--jt-line)); }
+#app.disabled-mode .disable-btn:hover { background: color-mix(in srgb, var(--jt-accent) 10%, transparent); border-color: var(--jt-accent); }
+
+/* Bandeau d'erreur persistant (diagnostic) */
+.err-banner {
+  background: var(--jt-ko-bg); color: var(--jt-ko);
+  border: 1px solid color-mix(in srgb, var(--jt-ko) 40%, transparent);
+  border-radius: var(--jt-r-lg); padding: 11px 12px; margin: 12px 0;
+  font-size: 12px; line-height: 1.45; word-break: break-word; white-space: pre-wrap;
+}
+
+/* ---------- Barre contextuelle (curseur sur une citation) ---------- */
+.ctxbar {
+  position: sticky; top: 56px; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: var(--jt-card);
+  border: 1px solid color-mix(in srgb, var(--jt-accent) 30%, var(--jt-line));
+  border-radius: var(--jt-r-md);
+  box-shadow: var(--jt-shadow-m);
+  padding: 7px 8px 7px 12px;
+  margin-bottom: 12px;
+}
+.ctx-info { display: flex; align-items: center; gap: 9px; min-width: 0; }
+/* Point lumineux (pastille d'état du kit) */
+.ctx-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex: none;
+  background: var(--jt-ok);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--jt-ok) 22%, transparent);
+}
+#ctxLabel {
+  font-size: 12px; font-weight: 650; color: var(--jt-ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ctxbar .mini.danger { flex: none; }
+
+/* ---------- Notification éphémère : dégradé de marque ---------- */
+.toast {
+  position: fixed; left: 12px; right: 12px; bottom: 14px; z-index: 50;
+  background: var(--jt-grad); color: var(--jt-cta-ink);
+  padding: 10px 14px; border-radius: 14px;
+  font-size: 12.5px; font-weight: 550; letter-spacing: -.01em; text-align: center;
+  box-shadow: 0 8px 26px var(--jt-glow), var(--jt-shadow-l);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .25s var(--jt-ease), transform .25s var(--jt-ease);
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.busy { opacity: .6; pointer-events: none; }
+
+/* Ascenseur discret du kit */
+html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--jt-ink-3) 45%, transparent) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--jt-ink-3) 42%, transparent);
+  border: 3px solid transparent; background-clip: content-box; border-radius: 999px;
+}
+
+/* ---------- Onglets « Nos pièces » / « Pièces adverses » (V9) ---------- */
+.side-tabs {
+  display: flex; gap: 4px; padding: 3px; margin: -2px 0 12px;
+  background: var(--jt-card-2); border: 1px solid var(--jt-line); border-radius: var(--jt-r-pill);
+}
+.side-tab {
+  flex: 1 1 0; min-width: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 30px; padding: 0 8px; border: none; border-radius: var(--jt-r-pill);
+  background: transparent; color: var(--jt-ink-2); cursor: pointer; white-space: nowrap;
+  font: inherit; font-size: 12px; font-weight: 650; letter-spacing: -.01em;
+  transition: all .18s var(--jt-ease);
+}
+.side-tab:hover { color: var(--jt-ink); }
+.side-tab.is-active { background: var(--jt-card); color: var(--jt-accent); box-shadow: var(--jt-shadow-s), 0 0 0 1px var(--jt-line); }
+#tabAdv.is-active { color: var(--wp-adv-a); }
+.side-tab:focus-visible { outline: 2px solid var(--jt-accent); outline-offset: 1px; }
+/* Nombre de pièces : pastille VERTE (nos pièces) / BORDEAUX (pièces adverses), chiffre blanc.
+   Teintes foncées fixes dans les deux thèmes, pour que le blanc reste lisible. */
+.side-count {
+  min-width: 18px; height: 17px; padding: 0 5px; border-radius: 9px; display: inline-grid; place-items: center;
+  font-size: 10.5px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #113e2f, #286e55);
+}
+#tabAdv .side-count { background: linear-gradient(135deg, #6e1f2e, #a33c4c); }
+.side-count:empty { display: none; }
+
+/* Mode « pièces adverses » : ni bordereau, ni scan, ni diagnostics de nos pièces */
+#app.adv-mode .own-only, #app.adv-mode #diag { display: none !important; }
+
+/* Pièce adverse : pastille BORDEAUX (on distingue d'un coup d'œil les pièces de l'adversaire) */
+:root { --wp-adv-a: #6e1f2e; --wp-adv-b: #a33c4c; --wp-adv-ink: #fff7f8; --wp-adv-glow: rgba(110,31,46,.22); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --wp-adv-a: #e08b97; --wp-adv-b: #f0b3bb; --wp-adv-ink: #2a0a10; --wp-adv-glow: rgba(224,139,151,.18); }
+}
+:root[data-theme="dark"] { --wp-adv-a: #e08b97; --wp-adv-b: #f0b3bb; --wp-adv-ink: #2a0a10; --wp-adv-glow: rgba(224,139,151,.18); }
+.badge-input.adv {
+  background: linear-gradient(135deg, var(--wp-adv-a), var(--wp-adv-b));
+  color: var(--wp-adv-ink); box-shadow: 0 3px 10px var(--wp-adv-glow);
+}
+.badge-input.adv:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--wp-adv-a) 25%, transparent), 0 3px 10px var(--wp-adv-glow); }
+/* Onglet adverse : « Nouvelle pièce adverse » (et sa validation ✓) en dégradé bordeaux */
+#app.adv-mode .add-toggle, #app.adv-mode #addPieceBtn {
+  background: linear-gradient(135deg, var(--wp-adv-a), var(--wp-adv-b)); color: var(--wp-adv-ink);
+  box-shadow: 0 4px 14px var(--wp-adv-glow);
+}
+#app.adv-mode .add-toggle:hover, #app.adv-mode #addPieceBtn:hover { box-shadow: 0 6px 20px var(--wp-adv-glow); }
+#app.adv-mode #newPieceName:focus {
+  border-color: var(--wp-adv-a); box-shadow: 0 0 0 3px color-mix(in srgb, var(--wp-adv-a) 14%, transparent);
+}
+.piece.adv:hover { border-color: color-mix(in srgb, var(--wp-adv-a) 28%, var(--jt-line)); }
+
+/* Éléments propres à un onglet */
+#app:not(.adv-mode) .adv-only { display: none !important; }
+
+/* ---------- Import d'une liste de pièces adverses (copier-coller) ---------- */
+.adv-import {
+  margin-top: 8px; padding: 10px; border-radius: 14px;
+  background: var(--jt-card); border: 1px solid color-mix(in srgb, var(--wp-adv-a) 30%, var(--jt-line));
+  box-shadow: var(--jt-shadow-s); animation: jt-reveal .16s var(--jt-ease);
+}
+.adv-import textarea {
+  width: 100%; min-height: 96px; resize: vertical; box-sizing: border-box;
+  padding: 8px 10px; border: 1.5px solid var(--jt-line); border-radius: 10px;
+  font: inherit; font-size: 12px; line-height: 1.45; color: var(--jt-ink); background: var(--jt-card-2); outline: none;
+}
+.adv-import textarea::placeholder { color: var(--jt-ink-3); }
+.adv-import textarea:focus { border-color: var(--wp-adv-a); box-shadow: 0 0 0 3px color-mix(in srgb, var(--wp-adv-a) 14%, transparent); }
+.adv-import-preview { margin-top: 8px; }
+.adv-import-preview:empty { display: none; }
+.imp-summary { font-size: 11.5px; font-weight: 650; color: var(--jt-ink-2); margin: 0 2px 6px; }
+.imp-summary.none { font-weight: 500; color: var(--jt-ink-3); }
+.imp-list { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; scrollbar-width: thin; }
+.imp-row {
+  display: flex; align-items: flex-start; gap: 7px; padding: 5px 6px; border-radius: 8px; cursor: pointer;
+  font-size: 12px; line-height: 1.35;
+}
+.imp-row:hover { background: var(--jt-card-2); }
+.imp-row input { width: auto; margin: 3px 0 0; accent-color: var(--wp-adv-a); flex: none; }
+.imp-row.off .imp-name { color: var(--jt-ink-3); }
+.imp-num {
+  flex: none; min-width: 30px; height: 20px; padding: 0 5px; border-radius: 6px; display: grid; place-items: center;
+  font-size: 11px; font-weight: 750; color: var(--wp-adv-ink); background: linear-gradient(135deg, var(--wp-adv-a), var(--wp-adv-b));
+}
+.imp-body { flex: 1; min-width: 0; }
+.imp-name { font-weight: 600; overflow-wrap: anywhere; }
+.imp-note { display: block; font-size: 10.5px; color: var(--jt-ink-3); }
+.imp-note.warn { color: var(--jt-amber); }
+.adv-import-btns { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; }
+#app.adv-mode #advImportBtn { background: linear-gradient(135deg, var(--wp-adv-a), var(--wp-adv-b)); color: var(--wp-adv-ink); box-shadow: 0 4px 14px var(--wp-adv-glow); }
+#advImportBtn:disabled { opacity: .45; cursor: default; box-shadow: none; transform: none; }
+
+/* Pièce adverse VERROUILLÉE : même motif hachuré que nos pièces, en bordeaux */
+.badge-input.adv.locked {
+  border: 2px solid transparent;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 4px, var(--jt-card) 4px 9px) padding-box,
+    linear-gradient(135deg, color-mix(in srgb, var(--wp-adv-a) 22%, var(--jt-card)), color-mix(in srgb, var(--wp-adv-b) 26%, var(--jt-card))) padding-box,
+    linear-gradient(135deg, color-mix(in srgb, var(--wp-adv-a) 80%, transparent), color-mix(in srgb, var(--wp-adv-b) 80%, transparent)) border-box;
+  color: var(--wp-adv-a);
+  text-shadow: 0 0 2px var(--jt-card), 0 0 2px var(--jt-card);
+  box-shadow: none;
+}
+.piece.adv .mini.lock.on { color: var(--wp-adv-a); background: color-mix(in srgb, var(--wp-adv-a) 10%, var(--jt-card)); border-color: color-mix(in srgb, var(--wp-adv-a) 35%, var(--jt-line)); }

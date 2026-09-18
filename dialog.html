@@ -1,0 +1,28 @@
+<!-- Petite fenêtre de saisie (renommer / renuméroter / confirmer suppression) -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WordPiece</title>
+<link rel="stylesheet" href="juritel-design.css?v=mu7cs9hp" />
+<style>
+  body { padding: 20px 22px; font-size: 13px; background-color: var(--jt-card); background-image: none; }
+  h1 {
+    margin: 0 0 10px; font-size: 17px; font-weight: 750; letter-spacing: -.02em;
+    background: var(--jt-title-grad); -webkit-background-clip: text; background-clip: text; color: var(--jt-title-color);
+  }
+  #msg { margin-bottom: 12px; line-height: 1.5; white-space: pre-line; color: var(--jt-ink-2); }
+  .btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+  .jt-btn { padding: 9px 16px; font-size: 13px; }
+  #ok.danger { background: var(--jt-ko); color: var(--jt-bg); box-shadow: 0 4px 14px color-mix(in srgb, var(--jt-ko) 30%, transparent); }
+</style>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<script src="theme.js?v=mu7cs9hp"></script>
+
+<h1 id="title">WordPiece</h1>
+<div id="msg"></div>
+<input id="input" class="jt-input" type="text" />
+<div class="btns">
+  <button id="cancel" class="jt-btn" type="button">Annuler</button>
+  <button id="ok" class="jt-btn jt-btn--primary" type="button">OK</button>
+</div>
+
+<script src="dialog.js?v=mu7cs9hp"></script>
