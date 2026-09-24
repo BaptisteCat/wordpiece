@@ -1,0 +1,156 @@
+<!-- Mode d'emploi LexRef — fenêtre CENTRALE (Office dialog), ouverte par le « ? » du volet -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mode d'emploi</title>
+<link rel="stylesheet" href="juritel-design.css?v=mufdhhvn" />
+<style>
+  html, body { height: 100%; }
+  body { font-size: 12.5px; line-height: 1.55; color: var(--jt-ink-2); display: flex; flex-direction: column; min-height: 0; }
+  .head {
+    flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 18px;
+    background: color-mix(in srgb, var(--jt-bg) 76%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5);
+    border-bottom: 1px solid var(--jt-line);
+  }
+  .head h1 {
+    margin: 0; font-family: var(--jt-font-display); font-weight: 700; font-size: 24px; letter-spacing: -.012em; line-height: 1.1;
+    background: var(--jt-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .wrap { flex: 1; overflow-y: auto; padding: 16px 18px 18px; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--jt-ink-3) 45%, transparent) transparent; }
+  .intro { margin: 0 0 14px; font-size: 13px; color: var(--jt-ink); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; align-items: start; }
+
+  /* Section = carte du kit, titre = surtitre dégradé (comme les Réglages) */
+  section.fs {
+    margin: 0; padding: 10px 16px 14px; min-width: 0;
+    background: var(--jt-card); border: 1px solid var(--jt-line); border-radius: var(--jt-r); box-shadow: var(--jt-shadow-s);
+  }
+  section.fs h2 {
+    margin: 0; padding: 4px 0 2px;
+    font-size: 15px; font-weight: 750; letter-spacing: -.02em;
+    background: var(--jt-title-grad); -webkit-background-clip: text; background-clip: text; color: var(--jt-title-color);
+  }
+  .sub {
+    display: flex; align-items: center; gap: 8px;
+    margin: 12px 0 4px; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--jt-ink-2);
+  }
+  .sub::before {
+    content: ''; width: 3px; height: 12px; border-radius: 2px; flex: none;
+    background: linear-gradient(180deg, var(--jt-bar-a), var(--jt-bar-b));
+  }
+  p { margin: 6px 0; }
+  b { color: var(--jt-ink); font-weight: 650; }
+  ul { margin: 4px 0 0; padding-left: 16px; }
+  li { margin: 4px 0; }
+  li::marker { color: var(--jt-ink-3); }
+  .tip { font-size: 11.5px; color: var(--jt-ink-3); }
+  code {
+    background: var(--jt-card-2); color: var(--jt-accent); border: 1px solid var(--jt-line-2);
+    padding: 0 5px; border-radius: 5px; font-size: 11px; white-space: nowrap;
+  }
+  kbd {
+    background: var(--jt-card); border: 1px solid var(--jt-line); border-bottom-width: 2px;
+    border-radius: 5px; padding: 0 5px; font-size: 11px; font-family: inherit; color: var(--jt-ink);
+  }
+</style>
+<script src="embed.js?v=mufdhhvn"></script>
+<script src="theme.js?v=mufdhhvn" data-key="wordpiece.theme"></script>
+
+<div class="head">
+  <h1>Mode d'emploi</h1>
+  <button id="close" class="jt-iconbtn jt-iconbtn--sm" title="Fermer" aria-label="Fermer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+</div>
+
+<div class="wrap">
+  <p class="intro">LexRef gère vos pièces comme des <b>variables</b> : une fois insérées dans le texte,
+  elles se <b>renumérotent</b> et se mettent à jour partout (citations et bordereau) après
+  un renommage ou une réorganisation.</p>
+
+  <div class="grid">
+    <section class="fs">
+      <h2>Insérer une pièce</h2>
+      <p>Placez le curseur dans le texte, puis cliquez l'icône <b>d'insertion</b> (curseur de texte, en vert) d'une pièce de la liste
+      — ou tapez un raccourci directement dans le document.</p>
+      <div class="sub">Raccourcis (taper puis <kbd>Espace</kbd>)</div>
+      <ul>
+        <li><code>/pn</code> — nouvelle pièce au prochain numéro</li>
+        <li><code>/pn2</code> — insère une pièce au n°2 et <b>décale</b> les suivantes</li>
+        <li><code>/pn4.</code> — nouvelle sous-pièce sous la pièce 4 (4.1, 4.2…)</li>
+        <li><code>/pn4.2</code> — insère la sous-pièce 4.2 et décale les suivantes</li>
+        <li><code>/p3</code> — cite la pièce 3 (la crée au n°3 si besoin)</li>
+        <li><code>/p4-8</code> — plage 4 à 8 (crée &amp; nomme les pièces manquantes)</li>
+        <li><code>/p5+</code> — « Pièce n°5 et suivantes »</li>
+        <li><code>/pf</code> — formate une ligne libre (ex. « Pièces n°4, 8 et 12 »)</li>
+      </ul>
+      <p class="tip">Astuce : verrouillez 🔒 une pièce pour figer son numéro ; les autres se renumérotent autour.</p>
+    </section>
+
+    <section class="fs">
+      <h2>Renommer &amp; réorganiser</h2>
+      <p>Renommez une pièce depuis la liste ou directement dans le bordereau : toutes ses citations
+      suivent. Changez l'ordre avec les flèches ▲▼ (les numéros se recalculent partout), verrouillez 🔒
+      un numéro pour le figer, ou cliquez <b>⇅ Ordre d'apparition</b> pour renuméroter selon l'ordre
+      de citation dans le texte.</p>
+      <div class="sub">Préciser une citation (page, article…)</div>
+      <p>Dans le texte, ajoutez la précision <b>à la fin d'une citation</b> :
+      « Pièce n°5 : Contrat de bail<b>, page 8</b> ». Elle vaut <b>uniquement pour cette
+      occurrence</b> : le nom de la pièce, le bordereau et les autres citations ne bougent pas, et la
+      précision survit aux renumérotations.</p>
+      <p>La précision doit commencer par une ponctuation
+      (<code>,</code> <code>;</code> <code>(</code> <code>—</code>) ou par
+      <code>p.</code> / <code>page</code> / <code>art.</code> / <code>§</code> — sinon votre saisie
+      est comprise comme un <b>renommage</b> de la pièce. Pour la retirer, effacez-la : elle ne
+      revient pas.</p>
+    </section>
+
+    <section class="fs">
+      <h2>Pièces adverses</h2>
+      <p>L'onglet <b>Pièces adverses</b> (en haut du volet) affiche leur liste, sans encombrer la vôtre.
+      Elles se citent comme vos pièces, avec <code>/pa</code> ; leur numéro est celui de l'adversaire
+      (jamais renuméroté ; verrouillé 🔒 par défaut, déverrouillez pour le corriger) et elles ne figurent
+      pas dans votre bordereau.</p>
+      <div class="sub">Coller la liste adverse</div>
+      <p>Copiez la liste qui termine les conclusions ou l'assignation adverses et collez-la dans la zone
+      prévue. Les pièces sont détectées aussitôt (« 1. », « 1) », « 1 - », « Pièce n°1 : », « 4.1 »,
+      « 2 bis », tableau…) ; décochez celles à écarter puis cliquez « Importer ».</p>
+      <div class="sub">Raccourcis</div>
+      <ul>
+        <li><code>/pa1</code> — cite la pièce adverse n°1 (la crée : « Pièce adverse n°1 : », tapez le nom puis <kbd>Entrée</kbd>)</li>
+        <li><code>/pan</code> — nouvelle pièce adverse au numéro suivant</li>
+        <li><code>/pa4-8</code>, <code>/pa5+</code>, <code>/pa1,2,5</code> — plage, « et suivantes », liste</li>
+        <li><code>/pa</code> ou <code>/paassignation</code> — citer une pièce adverse par son nom</li>
+      </ul>
+      <div class="sub">Présentation</div>
+      <p>Par défaut, les citations adverses ont la même présentation que les vôtres. Pour les distinguer,
+      décochez « Même présentation que nos pièces » dans <b>Réglages ▸ Citations des pièces adverses</b> :
+      format, gras, italique, souligné, alignement et ligne dédiée deviennent propres aux pièces adverses.</p>
+    </section>
+
+    <section class="fs">
+      <h2>Bordereau</h2>
+      <p>« Générer le bordereau » crée la liste des pièces en fin de document ; « Mettre à jour » la
+      régénère. Sa présentation (titre, alignements, tailles, interlignes) se règle dans
+      <b>Réglages ▸ Bordereau</b>.</p>
+    </section>
+
+    <section class="fs">
+      <h2>Retrouver des pièces existantes</h2>
+      <p>« 🔍 Rechercher les pièces existantes » détecte les pièces déjà saisies à la main et les
+      reprend en gestion automatique. La détection est tolérante : <code>Pièce n°5 : Nom</code>,
+      <code>Pièce 5 : Nom</code>, <code>Pièce n°5) Nom</code>, <code>Pièce n°5). Nom</code>,
+      les sous-pièces <code>1.1</code>, le pluriel, « n° » présent ou non, séparateurs variés…</p>
+      <p>Si votre format n'est pas reconnu, ouvrez <b>Format personnalisé…</b> et décrivez-le avec
+      <code>{num}</code> et <code>{nom}</code> (ex. <code>Pièce n°{num} : {nom}</code>).</p>
+    </section>
+
+    <section class="fs">
+      <h2>Avertissements</h2>
+      <p>Chaque point signalé dans « À corriger » / « À vérifier » porte un bouton
+      <b>Ignorer</b> : le point est masqué <b>pour ce document seulement</b>, et reste réversible via
+      « Tout réafficher ». Pratique pour un trou de numérotation volontaire ou un doublon assumé.</p>
+    </section>
+  </div>
+</div>
+
+<script src="help-dialog.js?v=mufdhhvn"></script>

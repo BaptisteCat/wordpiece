@@ -1,0 +1,77 @@
+<!-- Palette de recherche : citer une pièce par son NOM (fenêtre centrée, hors du volet) -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Citer une pièce</title>
+<link rel="stylesheet" href="juritel-design.css?v=mufdhhvn" />
+<style>
+  body {
+    font-size: 13px; display: flex; flex-direction: column; height: 100vh; min-height: 0;
+  }
+  .search { padding: 14px 14px 10px; border-bottom: 1px solid var(--jt-line); }
+  .search-row { display: flex; align-items: center; gap: 8px; }
+  .search-row .jt-search { flex: 1; min-width: 0; }
+  .hint { font-size: 11px; color: var(--jt-ink-3); margin: 8px 4px 0; }
+  /* La zone défile verticalement ; la liste garde sa hauteur naturelle, en 2 colonnes ÉQUILIBRÉES au
+     plus (jamais de 3e colonne : une liste multicolonne de hauteur fixe en créerait à droite). */
+  .scroller {
+    flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+    scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--jt-ink-3) 45%, transparent) transparent;
+  }
+  ul {
+    list-style: none; margin: 0; padding: 8px;
+    column-gap: 14px; column-rule: 1px solid var(--jt-line-2);
+    column-fill: balance;
+  }
+  /* Hauteur variable : un nom long passe à la ligne (search-piece.js MESURE le débordement pour
+     choisir le nombre de colonnes). Le numéro reste calé en haut, face à la 1re ligne du nom. */
+  li {
+    display: flex; align-items: flex-start; gap: 9px; padding: 6px 9px; border-radius: 10px; cursor: pointer;
+    border: 1px solid transparent; transition: background .14s, border-color .14s;
+    break-inside: avoid; -webkit-column-break-inside: avoid; /* ne pas couper une ligne entre 2 colonnes */
+  }
+  li:hover { background: var(--jt-card); }
+  li.sel { background: var(--jt-card); border-color: color-mix(in srgb, var(--jt-accent) 40%, var(--jt-line)); box-shadow: var(--jt-shadow-s); }
+  .num {
+    min-width: 28px; height: 22px; padding: 0 6px; display: grid; place-items: center; flex: none;
+    background: linear-gradient(135deg, var(--jt-chip-a), var(--jt-chip-b)); color: var(--jt-chip-ink);
+    border-radius: 7px; font-weight: 750; font-size: 11.5px;
+  }
+  /* Pièce verrouillée : contour vert + hachures diagonales (même motif que dans le volet) */
+  .num.grey {
+    border: 2px solid transparent;
+    background:
+      repeating-linear-gradient(135deg, transparent 0 4px, var(--jt-card) 4px 9px) padding-box,
+      linear-gradient(135deg, color-mix(in srgb, var(--jt-chip-a) 22%, var(--jt-card)), color-mix(in srgb, var(--jt-chip-b) 26%, var(--jt-card))) padding-box,
+      linear-gradient(135deg, color-mix(in srgb, var(--jt-chip-a) 80%, transparent), color-mix(in srgb, var(--jt-chip-b) 80%, transparent)) border-box;
+    color: var(--jt-chip-a);
+    text-shadow: 0 0 2px var(--jt-card), 0 0 2px var(--jt-card);
+  }
+  /* Pièces adverses : pastille bordeaux (comme dans le volet) */
+  body.adv .num { background: linear-gradient(135deg, #6e1f2e, #a33c4c); color: #fff7f8; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body.adv .num { background: linear-gradient(135deg, #e08b97, #f0b3bb); color: #2a0a10; } }
+  :root[data-theme="dark"] body.adv .num { background: linear-gradient(135deg, #e08b97, #f0b3bb); color: #2a0a10; }
+  /* Nom TOUJOURS affiché en entier : retour à la ligne, jamais de « … » */
+  .nm { flex: 1; min-width: 0; padding-top: 2px; line-height: 1.35; overflow-wrap: anywhere; font-weight: 550; }
+  li.sel .nm { color: var(--jt-ink); }
+  .empty { padding: 26px 12px; text-align: center; color: var(--jt-ink-3); }
+  kbd {
+    background: var(--jt-card); border: 1px solid var(--jt-line); border-bottom-width: 2px;
+    border-radius: 5px; padding: 0 4px; font-size: 10.5px; font-family: inherit; color: var(--jt-ink-2);
+  }
+</style>
+<script src="embed.js?v=mufdhhvn"></script>
+<script src="theme.js?v=mufdhhvn" data-key="wordpiece.theme"></script>
+
+<div class="search">
+  <div class="search-row">
+   <div class="jt-search">
+    <span class="jt-search__lens"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+    <input id="q" class="jt-search__input" type="text" placeholder="Nom ou numéro…" autocomplete="off" />
+   </div>
+   <button id="close" class="jt-iconbtn jt-iconbtn--sm" title="Annuler (Échap)" aria-label="Annuler"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+  </div>
+  <div class="hint"><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> pour naviguer · <kbd>Entrée</kbd> pour citer · <kbd>Échap</kbd> pour annuler</div>
+</div>
+<div id="scroller" class="scroller"><ul id="list"></ul></div>
+
+<script src="search-piece.js?v=mufdhhvn"></script>

@@ -1,0 +1,287 @@
+<!-- Réglages WordPiece — fenêtre CENTRALE (Office dialog), pilotée par le volet via messagerie -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Réglages</title>
+<link rel="stylesheet" href="juritel-design.css?v=mufdhhvn" />
+<style>
+  html, body { height: 100%; }
+  body { font-size: 12.5px; display: flex; flex-direction: column; min-height: 0; }
+  .head {
+    flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 18px;
+    background: color-mix(in srgb, var(--jt-bg) 76%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5);
+    border-bottom: 1px solid var(--jt-line);
+  }
+  .head h1 {
+    margin: 0; font-family: var(--jt-font-display); font-weight: 700; font-size: 24px; letter-spacing: -.012em; line-height: 1.1;
+    background: var(--jt-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .wrap { flex: 1; overflow-y: auto; padding: 16px 18px 18px; }
+  /* Deux colonnes EXPLICITES, chacune empilant ses cartes : avec auto-fit, des cartes
+     de hauteurs très différentes se plaçaient au hasard et laissaient des trous.
+     Sous 680 px (fenêtre étroite, Word pour le web), tout repasse sur une colonne. */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  .col { display: grid; gap: 14px; align-content: start; min-width: 0; }
+  @media (max-width: 680px) { .grid { grid-template-columns: 1fr; } }
+
+  /* Catégorie = carte du kit, légende = surtitre */
+  fieldset.fs {
+    margin: 0; padding: 10px 16px 16px; min-width: 0;
+    background: var(--jt-card); border: 1px solid var(--jt-line); border-radius: var(--jt-r); box-shadow: var(--jt-shadow-s);
+  }
+  fieldset.fs legend {
+    float: left; width: 100%; padding: 4px 0 2px;
+    font-size: 15px; font-weight: 750; letter-spacing: -.02em;
+    background: var(--jt-title-grad); -webkit-background-clip: text; background-clip: text; color: var(--jt-title-color);
+  }
+  fieldset.fs legend + * { clear: both; }
+
+  /* Sous-section : titre à barrette dégradée */
+  .sub {
+    display: flex; align-items: center; gap: 8px;
+    margin: 16px 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--jt-ink-2);
+  }
+  .sub::before {
+    content: ''; width: 3px; height: 12px; border-radius: 2px; flex: none;
+    background: linear-gradient(180deg, var(--jt-bar-a), var(--jt-bar-b));
+  }
+  .sub:first-of-type { margin-top: 10px; }
+  .sub code { text-transform: none; letter-spacing: 0; }
+
+  .setting { margin-top: 6px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  .row2 label, .setting > label { display: block; font-size: 11px; font-weight: 650; color: var(--jt-ink-2); margin-bottom: 5px; }
+  input[type=text], input[type=number], select {
+    width: 100%; padding: 7px 10px; font: inherit; font-size: 12.5px; color: var(--jt-ink);
+    border: 1.5px solid var(--jt-line); border-radius: 10px; background: var(--jt-card-2);
+    outline: none; transition: border-color .18s, box-shadow .18s;
+  }
+  input:focus, select:focus { border-color: var(--jt-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--jt-accent) 12%, transparent); }
+  select { cursor: pointer; }
+  .hint { font-size: 11px; color: var(--jt-ink-3); margin-top: 5px; line-height: 1.5; }
+  code {
+    background: var(--jt-card-2); color: var(--jt-accent); border: 1px solid var(--jt-line-2);
+    padding: 0 5px; border-radius: 5px; font-size: 10.5px;
+  }
+  .fmt-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .fmt-row .align { flex: 1; min-width: 120px; width: auto; }
+  .fmt-grid { display: flex; align-items: center; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+  .fmt-label { font-size: 11px; font-weight: 650; min-width: 56px; color: var(--jt-ink-3); }
+
+  /* Case à cocher = puce du kit ; cochée → puce active en dégradé */
+  .chk {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px;
+    border: 1px solid var(--jt-line); border-radius: 18px; background: var(--jt-card-2); color: var(--jt-ink-2);
+    font-weight: 600; cursor: pointer; user-select: none; transition: all .18s var(--jt-ease);
+  }
+  .chk:hover { border-color: var(--jt-ink-3); color: var(--jt-ink); transform: translateY(-1px); box-shadow: var(--jt-shadow-s); }
+  .chk input[type=checkbox] { margin: 0; accent-color: var(--jt-accent); }
+  .chk:has(input[type=checkbox]:checked) {
+    background: linear-gradient(135deg, var(--jt-chip-a), var(--jt-chip-b));
+    color: var(--jt-chip-ink); border-color: transparent; box-shadow: 0 3px 10px var(--jt-chip-glow);
+  }
+  .chk:has(input[type=checkbox]:checked) input { accent-color: var(--jt-chip-ink); }
+  .chk.sz { cursor: default; }
+  .chk.sz input { width: 56px; padding: 3px 6px; }
+
+  .foot {
+    flex: none; display: flex; align-items: center; gap: 8px;
+    padding: 9px 18px 11px; font-size: 11.5px; font-weight: 550; color: var(--jt-ink-3);
+    border-top: 1px solid var(--jt-line); background: var(--jt-card);
+  }
+  .foot::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%; flex: none;
+    background: var(--jt-ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--jt-ok) 22%, transparent);
+  }
+  .hidden { display: none !important; }
+  .wrap { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--jt-ink-3) 45%, transparent) transparent; }
+</style>
+<script src="embed.js?v=mufdhhvn"></script>
+<script src="theme.js?v=mufdhhvn" data-key="wordpiece.theme"></script>
+
+<div class="head">
+  <h1>Réglages</h1>
+  <button id="close" class="jt-iconbtn jt-iconbtn--sm" title="Fermer" aria-label="Fermer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+</div>
+
+<div class="wrap">
+  <div class="grid">
+   <div class="col">
+    <!-- ============ Citations dans le texte ============ -->
+    <fieldset class="fs">
+      <legend>Citations dans le texte</legend>
+
+      <div class="sub">Format</div>
+      <div class="setting">
+        <input id="citationTemplate" type="text" />
+        <div class="hint">Jetons : <code>{num}</code> = numéro, <code>{nom}</code> = intitulé.</div>
+      </div>
+
+      <div class="sub">Mise en forme</div>
+      <div class="fmt-row">
+        <label class="chk"><input type="checkbox" id="citBold" /> <b>G</b></label>
+        <label class="chk"><input type="checkbox" id="citItalic" /> <i>I</i></label>
+        <label class="chk"><input type="checkbox" id="citUnderline" /> <u>S</u></label>
+        <select id="citAlign" class="align" title="Alignement du paragraphe de la citation">
+          <option value="none">Alignement : aucun</option>
+          <option value="left">Gauche</option>
+          <option value="center">Centré</option>
+          <option value="right">Droite</option>
+        </select>
+      </div>
+      <label class="chk" style="margin-top:8px;"><input type="checkbox" id="citNewLine" /> Insérer sur une nouvelle ligne</label>
+      <div class="hint">Évite que votre phrase suive l'alignement de la citation.</div>
+
+      <div class="sub">Citation d'une plage (<code>/p4-8</code>)</div>
+      <div class="setting">
+        <select id="rangeStyle">
+          <option value="inline">Compacte — « Pièces n°4 à 8 »</option>
+          <option value="stacked">Détaillée — chaque pièce sur sa ligne</option>
+        </select>
+      </div>
+
+      <div class="sub">Commandes tapées dans le texte</div>
+      <label class="chk"><input type="checkbox" id="uiSlashCommands" /> Reconnaître <code>/p</code>, <code>/pn</code>, <code>/pa</code>…</label>
+      <div class="hint">Décochez-les pour n'utiliser que les boutons du volet : <code>/p…</code> redevient
+        du texte ordinaire, et LexRef cesse de relire votre paragraphe à chaque déplacement du curseur.
+        Un nommage déjà commencé se termine normalement.</div>
+    </fieldset>
+
+    <!-- ============ Citations des pièces adverses ============ -->
+    <fieldset class="fs">
+      <legend>Citations des pièces adverses</legend>
+
+      <label class="chk"><input type="checkbox" id="advSame" /> Même présentation que nos pièces</label>
+      <div class="hint">Décochez pour distinguer les pièces adverses dans le texte (format et mise en forme propres).</div>
+
+      <div class="sub" data-advown>Format</div>
+      <div class="setting" data-advown>
+        <input id="advTemplate" type="text" />
+        <div class="hint">Jetons : <code>{num}</code> = numéro, <code>{nom}</code> = intitulé.</div>
+      </div>
+
+      <div class="sub" data-advown>Mise en forme</div>
+      <div class="fmt-row" data-advown>
+        <label class="chk"><input type="checkbox" id="advBold" /> <b>G</b></label>
+        <label class="chk"><input type="checkbox" id="advItalic" /> <i>I</i></label>
+        <label class="chk"><input type="checkbox" id="advUnderline" /> <u>S</u></label>
+        <select id="advAlign" class="align" title="Alignement du paragraphe de la citation adverse">
+          <option value="none">Alignement : aucun</option>
+          <option value="left">Gauche</option>
+          <option value="center">Centré</option>
+          <option value="right">Droite</option>
+        </select>
+      </div>
+      <label class="chk" style="margin-top:8px;" data-advown><input type="checkbox" id="advNewLine" /> Insérer sur une nouvelle ligne</label>
+    </fieldset>
+
+   </div>
+
+   <div class="col">
+    <!-- ============ Bordereau de fin de document ============ -->
+    <fieldset class="fs">
+      <legend>Bordereau de fin de document</legend>
+
+      <div class="sub">Titre</div>
+      <div class="setting">
+        <input id="bordTitle" type="text" />
+      </div>
+      <div class="fmt-row">
+        <label class="chk"><input type="checkbox" id="bordTitleBold" /> <b>G</b></label>
+        <label class="chk"><input type="checkbox" id="bordTitleUnderline" /> <u>S</u></label>
+        <label class="chk sz">Taille&nbsp;<input type="number" id="bordTitleSize" min="8" max="36" step="1" /></label>
+        <select id="bordTitleAlign" class="align">
+          <option value="left">Gauche</option>
+          <option value="center">Centré</option>
+          <option value="right">Droite</option>
+          <option value="justify">Justifié</option>
+        </select>
+      </div>
+
+      <div class="sub">Présentation</div>
+      <div class="setting">
+        <select id="bordLayout">
+          <option value="list">Liste — « Pièce n°1 : Nom »</option>
+          <option value="table">Tableau (N° | Intitulé)</option>
+        </select>
+      </div>
+
+      <div class="sub">Pièces</div>
+      <div class="row2" data-layout="list">
+        <div><label for="bordLabelTpl">Format de l'étiquette</label><input id="bordLabelTpl" type="text" /></div>
+        <div><label for="bordSep">Séparateur</label><input id="bordSep" type="text" placeholder=" : " /></div>
+      </div>
+      <div class="hint" data-layout="list">Étiquette : ex. <code>Pièce n°{num}</code> — jetons <code>{num}</code>, <code>{nom}</code>.</div>
+      <div class="fmt-grid">
+        <span class="fmt-label">Étiquette</span>
+        <label class="chk"><input type="checkbox" id="bordLabelBold" /> <b>G</b></label>
+        <label class="chk"><input type="checkbox" id="bordLabelItalic" /> <i>I</i></label>
+        <label class="chk"><input type="checkbox" id="bordLabelUnderline" /> <u>S</u></label>
+      </div>
+      <div class="fmt-grid">
+        <span class="fmt-label">Nom</span>
+        <label class="chk"><input type="checkbox" id="bordNameBold" /> <b>G</b></label>
+        <label class="chk"><input type="checkbox" id="bordNameItalic" /> <i>I</i></label>
+        <label class="chk"><input type="checkbox" id="bordNameUnderline" /> <u>S</u></label>
+      </div>
+      <div class="fmt-row" data-layout="list">
+        <label class="chk sz">Taille&nbsp;<input type="number" id="bordListSize" min="8" max="36" step="1" /></label>
+        <select id="bordListAlign" class="align">
+          <option value="left">Gauche</option><option value="center">Centré</option><option value="right">Droite</option><option value="justify">Justifié</option>
+        </select>
+        <select id="bordLineSpacing" class="align">
+          <option value="single">Interligne simple</option><option value="1.5">Interligne 1,5</option><option value="double">Interligne double</option>
+        </select>
+      </div>
+      <div class="fmt-row" data-layout="list">
+        <label class="chk"><input type="checkbox" id="bordSpaceBefore" /> Espace avant</label>
+        <label class="chk"><input type="checkbox" id="bordSpaceAfter" /> Espace après</label>
+      </div>
+    </fieldset>
+
+    <!-- ============ Volet LexRef ============ -->
+    <fieldset class="fs">
+      <legend>Volet LexRef</legend>
+
+      <div class="sub">Information curseur</div>
+      <label class="chk"><input type="checkbox" id="uiContextBar" /> Signaler la pièce sous le curseur</label>
+      <div class="hint">Affiche en haut du volet un bandeau « Curseur sur Pièce n°… », avec un bouton
+        pour retirer la citation à cet endroit. Décochez-le si vous préférez un volet silencieux.</div>
+
+      <div class="sub">Pièces adverses</div>
+      <label class="chk"><input type="checkbox" id="uiAdverseTab" /> Afficher l'onglet « Pièces adverses »</label>
+      <div class="hint">Décochez-le si vous ne citez jamais les pièces de la partie adverse : le volet
+        gagne la hauteur des onglets. L'onglet réapparaît de lui-même dès que le document contient
+        une pièce adverse — un réglage d'affichage ne cache jamais vos données.</div>
+
+      <div class="sub">Thème</div>
+      <div class="setting">
+        <select id="uiTheme">
+          <option value="auto">Comme Word</option>
+          <option value="light">Toujours clair</option>
+          <option value="dark">Toujours sombre</option>
+        </select>
+        <div class="hint">Par défaut, le volet suit le thème de Word. Imposez le vôtre si le contraste
+          de Word ne vous convient pas.</div>
+      </div>
+
+      <div class="sub">Densité</div>
+      <div class="setting">
+        <select id="uiDensity">
+          <option value="compact">Compacte — plus de pièces à l'écran</option>
+          <option value="standard">Standard</option>
+          <option value="comfortable">Confortable — texte plus grand</option>
+        </select>
+        <div class="hint">Le volet est étroit : en « confortable », tout grandit d'environ un dixième,
+          donc les intitulés longs se coupent plus tôt. En « compacte », vous voyez deux à trois pièces
+          de plus sans faire défiler.</div>
+      </div>
+    </fieldset>
+   </div>
+  </div>
+</div>
+
+<div class="foot">Ces réglages sont mémorisés et réappliqués à vos prochains documents.</div>
+
+<script src="settings-dialog.js?v=mufdhhvn"></script>

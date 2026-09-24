@@ -1,0 +1,141 @@
+<!-- Chargé dans le volet Office de Word -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LexRef</title>
+<link rel="stylesheet" href="juritel-design.css?v=mufdhhvn" />
+<link rel="stylesheet" href="taskpane.css?v=mufdhhvn" />
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<script src="theme.js?v=mufdhhvn" data-key="wordpiece.theme"></script>
+
+<div id="unsupported" class="hidden pad">
+  <h2>LexRef</h2>
+  <p>Cette extension doit être ouverte dans Microsoft Word.</p>
+</div>
+
+<div id="app" class="hidden">
+  <main>
+    <!-- Bandeau d'erreur PERSISTANT (diagnostic) : reste affiché tant qu'il y a une erreur -->
+    <div id="errBanner" class="err-banner hidden"></div>
+
+    <!-- Barre supérieure : croix de fermeture (gauche) + bouton d'aide (droite) -->
+    <div class="top-bar">
+      <div class="top-left">
+        <button id="paneClose" class="icon-btn close-x" title="Fermer le volet" aria-label="Fermer le volet"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        <span class="brand"><span class="brand-L">L</span>exRef</span>
+      </div>
+      <div class="top-actions">
+        <button id="pipErr" class="pip err hidden" title="Des points À CORRIGER — cliquer pour voir" aria-label="Points à corriger">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="#fff" d="M8 1.6 15.2 14.4 0.8 14.4Z"/><rect fill="currentColor" x="7.2" y="6" width="1.6" height="4.2" rx="0.8"/><circle fill="currentColor" cx="8" cy="12" r="0.95"/></svg>
+        </button>
+        <button id="pipWarn" class="pip warn hidden" title="Des points À VÉRIFIER — cliquer pour voir" aria-label="Points à vérifier">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="#fff" d="M8 1.6 15.2 14.4 0.8 14.4Z"/><rect fill="currentColor" x="7.2" y="6" width="1.6" height="4.2" rx="0.8"/><circle fill="currentColor" cx="8" cy="12" r="0.95"/></svg>
+        </button>
+        <button id="undoBtn" class="icon-btn" title="Rien à annuler" aria-label="Annuler la dernière action" disabled><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg></button>
+        <button id="settingsToggle" class="icon-btn" title="Réglages" aria-label="Réglages"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+        <button id="helpToggle" class="icon-btn" title="Aide / mode d'emploi" aria-label="Aide"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Onglets : nos pièces / pièces adverses (le volet n'affiche qu'une liste à la fois) -->
+    <nav id="sideTabs" class="side-tabs" role="tablist" aria-label="Liste affichée">
+      <button id="tabOwn" class="side-tab is-active" role="tab" aria-selected="true" title="Nos pièces : numérotation, bordereau, verrous">Nos pièces <span class="side-count"></span></button>
+      <button id="tabAdv" class="side-tab" role="tab" aria-selected="false" title="Pièces adverses : citées avec /pa (ex. /pa1)">Pièces adverses <span class="side-count"></span></button>
+    </nav>
+
+    <!-- Bandeau affiché quand l'extension est désactivée pour ce document -->
+    <div id="disabledBanner" class="disabled-banner hidden">
+      ⏸ Extension désactivée pour ce document. Les pièces déjà créées restent en place.
+      Utilisez « Réactiver l’extension pour ce document » en bas pour la rallumer.
+    </div>
+
+    <!-- Barre contextuelle : apparaît quand le curseur est sur une citation -->
+    <div id="ctxBar" class="ctxbar hidden">
+      <div class="ctx-info">
+        <span class="ctx-dot"></span>
+        <span id="ctxLabel"></span>
+      </div>
+      <button id="ctxRemoveBtn" class="mini danger"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Retirer ici</button>
+    </div>
+
+    <!-- Pop-up intégrée (overlay flouté couvrant le volet) -->
+    <div id="modal" class="modal-overlay hidden">
+      <div class="modal-card" id="modalCard"></div>
+    </div>
+
+    <!-- Diagnostics « À vérifier » : placés EN HAUT pour être bien visibles -->
+    <section id="diag" class="diag hidden"></section>
+
+    <!-- « + » (nouvelle pièce) et bordereau sur la MÊME ligne ; le champ de nom se déplie dessous -->
+    <section class="add-section">
+      <div class="action-row">
+        <button id="addToggle" class="btn primary add-toggle" title="Nouvelle pièce" aria-label="Nouvelle pièce"><svg class="plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg> <span id="addToggleLabel">Nouvelle pièce</span></button>
+        <div id="bordereauAction" class="bordereau-action own-only"></div>
+      </div>
+      <div id="addRow" class="row hidden">
+        <input id="newPieceName" type="text" placeholder="Intitulé de la pièce (ex. Contrat de bail…)" />
+        <button id="addPieceBtn" class="btn primary" title="Ajouter">✓</button>
+        <button id="addCancel" class="btn" title="Annuler">✕</button>
+      </div>
+      <!-- Onglet adverse : coller la liste des pièces du bordereau adverse (détection automatique) -->
+      <button id="advImportToggle" class="btn outline scan-btn adv-only" title="Collez la liste des pièces qui termine les conclusions ou l'assignation adverses : les pièces sont détectées automatiquement"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h6"/></svg> Coller la liste des pièces adverses</button>
+      <div id="advImport" class="adv-import adv-only hidden">
+        <textarea id="advImportText" rows="6" spellcheck="false" placeholder="Collez ici la liste des pièces adverses, par exemple :&#10;1. Assignation du 3 mars 2024&#10;Pièce n°2 : Contrat de bail&#10;3 - Constat d'huissier"></textarea>
+        <div id="advImportPreview" class="adv-import-preview"></div>
+        <div class="adv-import-btns">
+          <button id="advImportCancel" class="btn" type="button">Annuler</button>
+          <button id="advImportBtn" class="btn primary" type="button" disabled>Importer</button>
+        </div>
+      </div>
+      <button id="scanBtn" class="btn outline scan-btn own-only" title="Détecter les pièces déjà présentes dans le document (formats « Pièce n°N : Nom », « Pièce N ) Nom », « 1.1 »…)"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/><path d="m16 16-1.9-1.9"/></svg> Rechercher les pièces existantes</button>
+      <button id="scanFmtToggle" class="link-btn own-only" type="button" title="Si la détection automatique ne reconnaît pas votre format">Format personnalisé…</button>
+      <div id="scanFmtRow" class="row hidden own-only">
+        <input id="scanFormat" type="text" placeholder="ex. Pièce n°{num} : {nom}" title="Décrivez le format avec {num} (numéro) et {nom} (intitulé), {num} avant {nom}" />
+      </div>
+    </section>
+
+    <!-- Liste des pièces -->
+    <section>
+      <div class="section-head">
+        <h3><span id="listTitle">Pièces</span> <span id="pieceCount" class="muted"></span></h3>
+      </div>
+      <div id="pieceSearchWrap" class="piece-search-wrap hidden">
+        <input id="pieceSearch" class="piece-search" type="text" placeholder="Rechercher (nom ou n°)…" autocomplete="off" />
+        <button id="pieceSearchClear" class="piece-search-clear hidden" type="button" title="Effacer la recherche (Échap)" aria-label="Effacer la recherche"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+      </div>
+      <div id="listToolbar" class="list-toolbar hidden">
+        <button id="appearanceBtn" class="mini" title="Renuméroter les pièces selon leur ordre d'apparition dans le texte (les pièces verrouillées 🔒 et scannées gardent leur numéro)"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg> Ordre d'apparition</button>
+        <div id="lockVeil" class="lock-veil hidden" aria-hidden="true"></div>
+        <div id="lockMenu" class="drop-menu hidden" role="menu" aria-label="Portée du verrouillage"></div>
+        <button id="lockAllBtn" class="mini lock" aria-haspopup="menu" aria-expanded="false" title="Verrous : verrouiller ou déverrouiller d'un clic les pièces scannées, créées ou toutes"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Verrous</button>
+      </div>
+      <div id="pieceList" class="list"></div>
+      <div id="emptyState" class="empty muted hidden">
+        Aucune pièce pour l'instant. Ajoutez-en une ci-dessus, puis cliquez sur
+        l'icône d'insertion (curseur de texte) pour la citer à l'endroit du curseur.
+      </div>
+    </section>
+
+    <!-- Réglages : déplacés dans une FENÊTRE CENTRALE (settings-dialog.html), ouverte par l'engrenage -->
+
+    <!-- Désactivation de l'extension POUR CE DOCUMENT (n'efface rien) -->
+    <section class="disable-section">
+      <div class="disable-row">
+        <button id="disableBtn" class="btn disable-btn">Désactiver l’extension pour ce document</button>
+        <button id="disableInfo" class="icon-btn sm" title="En savoir plus" aria-label="Information"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button>
+      </div>
+      <div id="disableInfoPanel" class="hint disable-info hidden">
+        Gèle l'extension pour ce document : plus de détection <code>/p</code>, plus de mise à
+        jour automatique. Les pièces, citations et bordereau déjà créés restent intacts.
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Word pour le web : les fenêtres Office (réglages, aide, palette, invites) s'affichent ICI, dans le
+     volet, quand le navigateur les refuse. Sur Windows et Mac, ce panneau reste inutilisé. -->
+<div id="paneModal" class="pane-modal hidden" role="dialog" aria-modal="true" aria-label="Fenêtre LexRef">
+  <iframe id="paneModalFrame" title="Fenêtre LexRef"></iframe>
+</div>
+
+<script src="engine.js?v=mufdhhvn"></script>
+<script src="taskpane.js?v=mufdhhvn"></script>
