@@ -1,0 +1,92 @@
+/* global Office, WPMsg */
+// Fenêtre CENTRALE des réglages. Reçoit du volet (parent) l'objet settings + le schéma de liaison
+// (bindings), affiche le formulaire, et renvoie CHAQUE changement au parent sous forme { path, value }.
+// Le parent applique et enregistre (source de vérité unique : WP.model.settings dans le volet).
+
+WPMsg.ready(() => { // .then() : démarre toujours APRÈS l'évaluation complète du script
+  let bindings = [];
+  const byId = {};
+  const el = (id) => document.getElementById(id);
+  const getPath = (obj, path) => path.reduce((o, k) => (o ? o[k] : undefined), obj);
+
+  function applySettings(settings) {
+    for (const b of bindings) {
+      const elm = el(b.id);
+      if (!elm) continue;
+      const v = getPath(settings, b.path);
+      if (b.type === "checked") elm.checked = !!v;
+      else elm.value = v == null ? "" : v;
+    }
+    updateLayoutVisibility(settings);
+  }
+
+  function updateLayoutVisibility(settings) {
+    const isList = !settings || !settings.bordereau || settings.bordereau.layout !== "table";
+    document.querySelectorAll('[data-layout="list"]').forEach((n) => n.classList.toggle("hidden", !isList));
+    showAdverseOwn(!(!settings || !settings.adverse || settings.adverse.sameAsOwn !== false));
+    showDocType(settings && settings.docType === "lettre" ? "lettre" : "acte");
+    showLetterNumbered(!(settings && settings.lettre && settings.lettre.numbered === false));
+  }
+  // Acte / courrier : chaque type n'affiche que ses propres réglages ([data-doctype]).
+  function showDocType(type) {
+    document.querySelectorAll("[data-doctype]").forEach((n) => n.classList.toggle("hidden", n.dataset.doctype !== type));
+  }
+  // Courrier : réglages des pièces jointes numérotées ([data-letnum="1"]) ou non ([data-letnum="0"]).
+  function showLetterNumbered(numbered) {
+    document.querySelectorAll("[data-letnum]").forEach((n) => n.classList.toggle("hidden", (n.dataset.letnum === "1") !== numbered));
+  }
+  // Réglages propres aux pièces adverses : masqués tant qu'elles suivent la présentation de nos pièces.
+  function showAdverseOwn(show) {
+    document.querySelectorAll("[data-advown]").forEach((n) => n.classList.toggle("hidden", !show));
+  }
+
+  function readValue(b, elm) {
+    if (b.type === "checked") return elm.checked;
+    if (b.type === "number") {
+      const n = parseInt(elm.value, 10);
+      if (b.fallback == null) return n || 14;
+      // Champ à valeur plancher (numéro de départ) : on remet à l'écran la valeur retenue.
+      const v = n >= b.fallback ? n : b.fallback;
+      elm.value = v;
+      return v;
+    }
+    return elm.value; // "value" et "raw"
+  }
+
+  function bindChangeHandlers() {
+    for (const b of bindings) {
+      const elm = el(b.id);
+      if (!elm || byId[b.id]) continue;
+      byId[b.id] = b;
+      elm.addEventListener("change", () => {
+        const value = readValue(b, elm);
+        // Si la présentation du bordereau change, on ajuste tout de suite la visibilité locale.
+        if (b.id === "advSame") showAdverseOwn(!value);
+        if (b.id === "docType") showDocType(value);
+        if (b.id === "letNumbered") showLetterNumbered(value);
+        if (b.id === "bordLayout") {
+          document.querySelectorAll('[data-layout="list"]').forEach((n) => n.classList.toggle("hidden", value === "table"));
+        }
+        WPMsg.send(JSON.stringify({ path: b.path, value }));
+      });
+    }
+  }
+
+  el("close").addEventListener("click", () => WPMsg.send(JSON.stringify({ close: true })));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") WPMsg.send(JSON.stringify({ close: true }));
+  });
+
+  // Handshake : on enregistre le récepteur AVANT de signaler « ready » (sinon on raterait le message).
+  WPMsg.onParent(
+    (arg) => {
+      let data = null;
+      try { data = JSON.parse(arg.message); } catch (e) { data = null; }
+      if (!data) return;
+      bindings = Array.isArray(data.bindings) ? data.bindings : [];
+      applySettings(data.settings || {});
+      bindChangeHandlers();
+    },
+    () => { WPMsg.send(JSON.stringify({ ready: true })); }
+  );
+});
