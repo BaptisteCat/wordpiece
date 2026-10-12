@@ -1,0 +1,45 @@
+/* Pages publiques (support, confidentialité, conditions) : autonomes, sans police distante. */
+:root {
+  --bg: #fffdf6;
+  --ink: #1d2a24;
+  --muted: #5d6b64;
+  --brand: #1d5a44;
+  --line: #e4e0d2;
+  --code: #f1eee3;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141a17;
+    --ink: #e6ebe7;
+    --muted: #9aa8a0;
+    --brand: #8fc9ae;
+    --line: #2b3530;
+    --code: #1e2622;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141a17;
+  --ink: #e6ebe7;
+  --muted: #9aa8a0;
+  --brand: #8fc9ae;
+  --line: #2b3530;
+  --code: #1e2622;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+main { max-width: 720px; margin: 0 auto; padding: 48px 16px 64px; }
+.overline { margin: 0; color: var(--brand); font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+h1 { margin: 4px 0 8px; font-size: 30px; line-height: 1.2; }
+h2 { margin: 32px 0 8px; font-size: 19px; }
+h3 { margin: 20px 0 4px; font-size: 16px; }
+.meta { color: var(--muted); font-size: 14px; margin-top: 0; }
+a { color: var(--brand); }
+code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: 14px; }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+.foot { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
