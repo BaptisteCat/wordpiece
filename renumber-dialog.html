@@ -1,0 +1,166 @@
+<!-- Renuméroter les pièces — fenêtre CENTRALE (Office dialog) : aperçu complet, appliqué en une fois -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Renuméroter les pièces</title>
+<link rel="stylesheet" href="juritel-design.css?v=mwnqb11m" />
+<style>
+  html, body { height: 100%; }
+  body { font-size: 12.5px; display: flex; flex-direction: column; min-height: 0; margin: 0; }
+  .head {
+    flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 16px; border-bottom: 1px solid var(--jt-line);
+  }
+  .head h1 {
+    margin: 0; font-family: var(--jt-font-display); font-weight: 700; font-size: 21px; letter-spacing: -.012em; line-height: 1.1;
+    background: var(--jt-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .tools { flex: none; padding: 10px 16px 8px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--jt-line); }
+  .tool {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+    padding: 7px 9px; border: 1px solid var(--jt-line); border-radius: 11px; background: var(--jt-card);
+  }
+  .tool-label { font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--jt-ink-2); margin-right: 4px; }
+  .tool input[type=text] {
+    width: 62px; font: inherit; padding: 4px 7px; border-radius: 7px;
+    border: 1px solid var(--jt-line); background: var(--jt-card-2); color: var(--jt-ink);
+  }
+  .tool input[type=text]:focus, .newnum:focus { outline: none; border-color: var(--jt-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--jt-accent) 16%, transparent); }
+  .tool .sep { width: 1px; align-self: stretch; background: var(--jt-line); margin: 0 4px; }
+  .tool.sel-tool { border-color: color-mix(in srgb, var(--jt-accent) 40%, var(--jt-line)); background: color-mix(in srgb, var(--jt-accent) 6%, var(--jt-card)); }
+  .tool.sel-tool.off { opacity: .55; }
+  .tool.sel-tool.off :is(input, button) { pointer-events: none; }
+  .b {
+    font: inherit; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--jt-line); background: var(--jt-card-2); color: var(--jt-ink);
+  }
+  .b:hover { border-color: var(--jt-accent); color: var(--jt-accent); }
+  .b.primary { background: var(--jt-accent); border-color: var(--jt-accent); color: #fff; }
+  .b.primary:hover { filter: brightness(1.08); color: #fff; }
+  .b:disabled { opacity: .45; cursor: not-allowed; }
+  .search-box { flex: 1; min-width: 150px; display: flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 8px;
+    border: 1px solid var(--jt-line); background: var(--jt-card-2); color: var(--jt-ink-3); }
+  .search-box:focus-within { border-color: var(--jt-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--jt-accent) 16%, transparent); }
+  .search-box input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; color: var(--jt-ink); padding: 1px 0; }
+  .search-box input::-webkit-search-cancel-button { display: none; }
+  .search-box .clear { border: 0; background: none; color: var(--jt-ink-3); cursor: pointer; font-size: 15px; line-height: 1; padding: 0 2px; }
+  .search-box .clear:hover { color: var(--jt-accent); }
+  .row.kid.hit .name { font-weight: 650; }
+  .tool .mini { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--jt-ink-2); cursor: pointer; }
+  .row.newgrp .oldnum { font-style: italic; }
+  .opts { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: var(--jt-ink-2); }
+  .opts label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+  .hint { color: var(--jt-ink-3); }
+
+  .list-wrap { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 12px 12px; position: relative; }
+  .row {
+    display: grid; grid-template-columns: 20px 18px 52px 14px 82px 1fr 18px; align-items: center; gap: 6px;
+    padding: 4px 6px; border-radius: 9px; border: 1px solid transparent; user-select: none;
+  }
+  .row:hover { background: var(--jt-card); }
+  .row.sel { background: color-mix(in srgb, var(--jt-accent) 9%, var(--jt-card)); border-color: color-mix(in srgb, var(--jt-accent) 35%, var(--jt-line)); }
+  .row.kid { grid-template-columns: 20px 18px 52px 14px 82px 1fr 18px; }
+  .row.kid .name { padding-left: 14px; }
+  .row.locked .newnum { background: repeating-linear-gradient(135deg, transparent 0 4px, color-mix(in srgb, var(--jt-ink-3) 12%, transparent) 4px 8px); }
+  .row.changed .newnum { border-color: color-mix(in srgb, var(--jt-accent) 55%, var(--jt-line)); font-weight: 700; color: var(--jt-accent); }
+  .row.err .newnum { border-color: var(--jt-ko); color: var(--jt-ko); }
+  .row.dragging { position: relative; z-index: 5; pointer-events: none; opacity: .9; background: var(--jt-card); border-color: var(--jt-accent); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+  .row.drop-into { background: color-mix(in srgb, var(--jt-accent) 12%, var(--jt-card)); border-color: var(--jt-accent); }
+  body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select: none; }
+  .drop-hint { position: fixed; z-index: 50; pointer-events: none; padding: 4px 9px; border-radius: 8px; font-size: 11.5px; font-weight: 700;
+    color: #fff; background: var(--jt-accent); box-shadow: 0 4px 14px rgba(0,0,0,.18); white-space: nowrap; }
+  .drop-hint[hidden] { display: none; }
+  .grip { cursor: grab; color: var(--jt-ink-3); display: grid; place-items: center; }
+  .grip.off { visibility: hidden; }
+  .oldnum { text-align: right; color: var(--jt-ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .arrow { color: var(--jt-ink-3); text-align: center; }
+  .newnum {
+    width: 100%; box-sizing: border-box; font: inherit; padding: 3px 6px; border-radius: 7px; text-align: center;
+    border: 1px solid var(--jt-line); background: var(--jt-card-2); color: var(--jt-ink);
+  }
+  .kidnum { display: flex; align-items: center; gap: 2px; }
+  .kidnum span { color: var(--jt-ink-3); white-space: nowrap; }
+  .kidnum .newnum { min-width: 0; }
+  .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .name.group { font-weight: 650; color: var(--jt-ink-2); }
+  .lock { color: var(--jt-ink-3); display: grid; place-items: center; }
+  button.lock { border: 0; background: none; padding: 2px; border-radius: 5px; cursor: pointer; opacity: .35; }
+  button.lock.on { opacity: 1; }
+  .row:hover button.lock, button.lock:focus-visible { opacity: 1; }
+  button.lock:hover { color: var(--jt-accent); background: color-mix(in srgb, var(--jt-accent) 10%, transparent); }
+  button.lock.chg { color: var(--jt-accent); opacity: 1; }
+  .status.ok { color: var(--jt-ok, #1a7f4b); font-weight: 600; }
+  .drop-line { position: absolute; left: 12px; right: 12px; height: 2px; border-radius: 2px; background: var(--jt-accent); pointer-events: none; }
+  .empty { padding: 30px; text-align: center; color: var(--jt-ink-3); }
+
+  .foot {
+    flex: none; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 10px 16px; border-top: 1px solid var(--jt-line);
+  }
+  .status { flex: 1; min-width: 160px; font-size: 12px; color: var(--jt-ink-2); }
+  .status.err { color: var(--jt-ko); font-weight: 600; }
+  @media (max-width: 520px) {
+    .row, .row.kid { grid-template-columns: 18px 14px 40px 10px 70px 1fr 14px; gap: 4px; }
+    .tool input[type=text] { width: 50px; }
+  }
+</style>
+<script src="embed.js?v=mwnqb11m"></script>
+<script src="theme.js?v=mwnqb11m" data-key="wordpiece.theme"></script>
+
+<div class="head">
+  <h1 id="title">Renuméroter les pièces</h1>
+  <button id="close" class="jt-iconbtn jt-iconbtn--sm" title="Fermer sans appliquer (Échap)" aria-label="Fermer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+</div>
+
+<div class="tools">
+  <!-- Recherche : filtre la liste par nom ; « Tout sélectionner » ne prend que les pièces affichées -->
+  <div class="tool search-tool">
+    <span class="tool-label">Rechercher</span>
+    <span class="search-box">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="search" placeholder="ex. SMS" autocomplete="off" title="Filtre les pièces dont le nom contient ce texte (majuscules et accents ignorés)" />
+      <button id="qClear" class="clear" type="button" title="Effacer la recherche (Échap)" aria-label="Effacer la recherche" hidden>×</button>
+    </span>
+    <span id="qCount" class="hint"></span>
+    <button id="selAll" class="b" type="button" title="Sélectionne toutes les pièces affichées (Ctrl+A)">Tout sélectionner</button>
+  </div>
+  <!-- Tranche : « de 5 à 9 → à partir de 20 » -->
+  <div class="tool">
+    <span class="tool-label">Tranche</span>
+    de <input id="rFrom" type="text" placeholder="5" title="Premier numéro de la tranche (ex. 5, ou i.3)" />
+    à <input id="rTo" type="text" placeholder="9" title="Dernier numéro de la tranche" />
+    → à partir de <input id="rStart" type="text" placeholder="20" title="Nouveau premier numéro (ex. 20, i.1, A1…) ; les suivants s'enchaînent" />
+    <button id="rApply" class="b" type="button">Renuméroter la tranche</button>
+    <button id="rSelect" class="b" type="button" title="Sélectionner les pièces de la tranche (pour les glisser ou les décaler)">Sélectionner</button>
+  </div>
+  <!-- Actions sur la sélection -->
+  <div id="selTool" class="tool sel-tool off">
+    <span class="tool-label" id="selCount">Sélection</span>
+    à partir de <input id="sStart" type="text" placeholder="1" title="Numérote la sélection dans l'ordre affiché : 1, 2, 3… (ou i.1, A1…)" />
+    <button id="sNumber" class="b" type="button">Numéroter</button>
+    <span class="sep"></span>
+    décaler de <input id="sShift" type="text" placeholder="+1" title="Ajoute (ou retire, avec −) ce nombre aux numéros sélectionnés" />
+    <button id="sShiftBtn" class="b" type="button">Décaler</button>
+    <span class="sep"></span>
+    <button id="sGroup" class="b" type="button" title="Range la sélection en sous-pièces d'un même numéro : 4, 5, 6 → 4.1, 4.2, 4.3 (ou ajoute-les à la fin d'un groupe existant sélectionné)">Grouper en sous-pièces</button>
+    <label class="mini" title="Les pièces suivantes reprennent les numéros libérés (9 → 6…). Décoché : elles gardent leur numéro.">
+      <input id="gCompact" type="checkbox" checked /> resserrer la suite</label>
+    <span class="sep"></span>
+    <button id="sReset" class="b" type="button" title="Remet leur numéro actuel aux pièces sélectionnées (défait aussi un regroupement)">Rétablir</button>
+    <button id="sNone" class="b" type="button">Désélectionner</button>
+  </div>
+  <div class="opts">
+    <label title="Les pièces verrouillées 🔒 restent sinon à leur numéro (ni sélection, ni glisser-déposer). Cliquez un cadenas pour verrouiller / déverrouiller une pièce."><input id="incLocked" type="checkbox" /> Inclure les pièces verrouillées</label>
+    <span class="hint">Clic : sélectionner · Ctrl+clic : ajouter · Maj+clic : plage · Ctrl+A : tout (ce qui est affiché) · glisser ⋮⋮ : déplacer, y compris dans / hors d'un groupe · « Grouper » : 4, 5, 6 → 4.1, 4.2, 4.3 · 🔒 cliquable</span>
+  </div>
+</div>
+
+<div id="listWrap" class="list-wrap"><div id="list"></div></div>
+
+<div class="foot">
+  <div id="status" class="status"></div>
+  <button id="resetAll" class="b" type="button">Tout rétablir</button>
+  <button id="cancel" class="b" type="button">Annuler</button>
+  <button id="apply" class="b primary" type="button" disabled>Appliquer</button>
+</div>
+
+<script src="renumber-dialog.js?v=mwnqb11m"></script>
